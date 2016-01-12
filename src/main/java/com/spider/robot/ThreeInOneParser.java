@@ -96,14 +96,6 @@ public class ThreeInOneParser implements Runnable {
     @Autowired
     private HeartBeatService heartBeatService;
 
-    private WebClient webClient = new WebClient();
-
-    {
-        webClient.getOptions().setCssEnabled(false);
-        webClient.getOptions().setThrowExceptionOnScriptError(false);
-        webClient.getOptions().setJavaScriptEnabled(true);
-    }
-
     private ExecutorService executorService = Executors.newFixedThreadPool(20);
 
     public ThreeInOneParser() {
@@ -163,9 +155,13 @@ public class ThreeInOneParser implements Runnable {
     public void parse(TCrawlerWin310 win310, CountDownLatch countDownLatch) {
 
         String url = formatUrl(win310);
+        WebClient webClient = new WebClient();
         try {
             logger.info("url [" + url + "] start....");
             String html = Win310AndSportteryUtils.getOddsHtml(url, new HttpClientFetcherImpl(), httpConfig, null);
+            webClient.getOptions().setCssEnabled(false);
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
             HtmlPage htmlPage = webClient.getPage(url);
             synchronized (this) {
                 Long id = win310.getId();
@@ -208,6 +204,7 @@ public class ThreeInOneParser implements Runnable {
         } catch (Exception e) {
             logger.info("catch " + companyName + " url " + url + " error", e);
         } finally {
+            webClient.closeAllWindows();
             countDownLatch.countDown();
             logger.info(companyName + " CountDownLatch is " + countDownLatch.getCount() + ", matchCode[" + win310.getCompetitionNum() + "]");
         }
