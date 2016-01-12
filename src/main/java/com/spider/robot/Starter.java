@@ -27,7 +27,7 @@ public class Starter {
 
     private Logger appLogger = Logger.getLogger("app_logger");
 
-    private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(INITIAL_DELAY);
+    private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(8);
 
     @Autowired
     @Qualifier("jbbParser")
