@@ -11,7 +11,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by wsy on 2016/1/5.
+ * 启动所有抓取任务
+ *
+ * @author wsy
  */
 @Component
 public class Starter {
