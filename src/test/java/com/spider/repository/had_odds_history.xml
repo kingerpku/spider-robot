@@ -1,0 +1,9 @@
+<?xml version="1.0" standalone="yes"?>
+<dataset>
+    <HadOddsHistory ID="182581" WIN310_ID="4050" GAMING_COMPANY="利记" ODDS_D="2.99" ODDS_A="2.72" ODDS_H="2.64"
+                    UPDATE_TIME="2015/10/26 09:48:04" odds_update_time="10-2600:41" STATE="早" SCORE="-"
+                    DURATION_TIME=""/>
+    <HadOddsHistory ID="182582" WIN310_ID="4050" GAMING_COMPANY="金宝博" ODDS_D="3.15" ODDS_A="2.60" ODDS_H="2.50"
+                    UPDATE_TIME="2015/10/26 09:48:04" odds_update_time="10-2609:01" STATE="即" SCORE="-"
+                    DURATION_TIME=""/>
+</dataset>

@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="yes"?>
+<dataset>
+    <HighLowOddsHistory ID="128919" WIN310_ID="4050" GAMING_COMPANY="利记" HANDICAP_LINE="2" ODDS_LOW="2.08" ODDS_HIGH="1.82"
+            UPDATE_TIME="2015/10/26 09:48:04" odds_update_time="10-2519:39" STATE="早" SCORE="-" DURATION_TIME=""/>
+    <HighLowOddsHistory ID="148652" WIN310_ID="3853" GAMING_COMPANY="利记" HANDICAP_LINE="6" ODDS_LOW="2.07" ODDS_HIGH="1.83"
+            UPDATE_TIME="2015/10/31 04:31:55" odds_update_time="10-3104:22" STATE="滚" SCORE="1-4" DURATION_TIME="62"/>
+    <HighLowOddsHistory ID="148653" WIN310_ID="3853" GAMING_COMPANY="金宝博" HANDICAP_LINE="6" ODDS_LOW="2.06" ODDS_HIGH="1.82"
+            UPDATE_TIME="2015/10/31 04:31:55" odds_update_time="10-3104:22" STATE="滚" SCORE="1-4" DURATION_TIME="61"/>
+    <HighLowOddsHistory ID="148654" WIN310_ID="3856" GAMING_COMPANY="利记" HANDICAP_LINE="1.5/2" ODDS_LOW="2.13" ODDS_HIGH="1.78"
+            UPDATE_TIME="2015/10/31 04:31:55" odds_update_time="10-3104:22" STATE="滚" SCORE="1-0" DURATION_TIME="66"/>
+    <HighLowOddsHistory ID="148655" WIN310_ID="3856" GAMING_COMPANY="金宝博" HANDICAP_LINE="1.5/2" ODDS_LOW="2.14" ODDS_HIGH="1.75"
+            UPDATE_TIME="2015/10/31 04:31:55" odds_update_time="10-3104:22" STATE="滚" SCORE="1-0" DURATION_TIME="66"/>
+</dataset>

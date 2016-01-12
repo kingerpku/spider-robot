@@ -1,0 +1,7 @@
+*.properties
+/.idea
+/.idea/*
+spider-robot.iml
+/target
+/target/*
+/src/main/resources/*.xml

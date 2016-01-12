@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="yes"?>
+<dataset>
+    <ServiceStateHistory ID="36753" SERVICE="Sporttery-Robot" START_TIME="1447663535589" END_TIME="1447663536522"
+                         SUCCESS="" ERROR_MSG=""/>
+    <ServiceStateHistory ID="36754" SERVICE="Win310-Robot" START_TIME="1447663537059" END_TIME="1447663538611"
+                         SUCCESS="" ERROR_MSG=""/>
+    <ServiceStateHistory ID="36755" SERVICE="Sporttery-Robot" START_TIME="1447663565590" END_TIME="1447663566725"
+                         SUCCESS="" ERROR_MSG=""/>
+    <ServiceStateHistory ID="36756" SERVICE="Win310-Robot" START_TIME="1447663568698" END_TIME="1447663569923"
+                         SUCCESS="" ERROR_MSG=""/>
+    <ServiceStateHistory ID="36757" SERVICE="Sporttery-Robot" START_TIME="1447663595590" END_TIME="1447663596515"
+                         SUCCESS="" ERROR_MSG=""/>
+</dataset>
