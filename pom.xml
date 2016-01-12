@@ -82,34 +82,9 @@
             <version>1.8.0.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
-            <artifactId>rocketmq-tools</artifactId>
-            <version>${rocketmq.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
-            <artifactId>rocketmq-common</artifactId>
-            <version>${rocketmq.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
-            <artifactId>rocketmq-srvutil</artifactId>
-            <version>${rocketmq.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
-            <version>${rocketmq.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.xbean</groupId>
             <artifactId>xbean-spring</artifactId>
             <version>4.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>3.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -143,31 +118,6 @@
             <version>1.7.1</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-xml</artifactId>
-            <version>2.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-parameter-names</artifactId>
-            <version>2.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.11</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>4.5</version>
@@ -188,11 +138,6 @@
             <version>1.2.17</version>
         </dependency>
         <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
             <artifactId>jxl</artifactId>
             <version>2.6.10</version>
@@ -203,35 +148,10 @@
             <version>1.0.2</version>
         </dependency>
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-all</artifactId>
-            <version>5.11.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils-core</artifactId>
-            <version>1.8.0</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -242,11 +162,6 @@
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -349,11 +264,6 @@
             <artifactId>im4java</artifactId>
             <version>1.4.0</version>
         </dependency>
-        <!-- <dependency> -->
-        <!-- <groupId>org.seleniumhq.selenium</groupId> -->
-        <!-- <artifactId>selenium-server</artifactId> -->
-        <!-- <version>2.46.0</version> -->
-        <!-- </dependency> -->
         <dependency>
             <groupId>oro</groupId>
             <artifactId>oro</artifactId>
@@ -364,7 +274,6 @@
             <artifactId>jaudiotagger</artifactId>
             <version>2.0.3</version>
         </dependency>
-
         <dependency>
             <groupId>com.mortennobel</groupId>
             <artifactId>java-image-scaling</artifactId>
@@ -417,16 +326,6 @@
             <artifactId>cssparser</artifactId>
             <version>0.9.15</version>
         </dependency>
-        <!-- <dependency> -->
-        <!-- <groupId>net.sourceforge.htmlunit</groupId> -->
-        <!-- <artifactId>htmlunit</artifactId> -->
-        <!-- <version>2.17</version> -->
-        <!-- </dependency> -->
-        <!-- <dependency> -->
-        <!-- <groupId>net.sourceforge.htmlunit</groupId> -->
-        <!-- <artifactId>htmlunit-core-js</artifactId> -->
-        <!-- <version>2.16</version> -->
-        <!-- </dependency> -->
         <dependency>
             <groupId>com.cloudhopper.proxool</groupId>
             <artifactId>proxool</artifactId>
@@ -493,54 +392,10 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
-
-        <!-- matlab dependency -->
-        <dependency>
-            <groupId>com.caiex.matlab</groupId>
-            <artifactId>cx_OddsConverter</artifactId>
-            <version>3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.caiex.matlab</groupId>
-            <artifactId>cxll</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.caiex.matlab</groupId>
-            <artifactId>javabuilder</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.caiex.matlab</groupId>
-            <artifactId>kc1</artifactId>
-            <version>1.0</version>
-        </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.6</version>
-        </dependency>
-
-        <!-- matlab dependency -->
-        <dependency>
-            <groupId>com.caiex.matlab</groupId>
-            <artifactId>OddsConverter</artifactId>
-            <version>6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.caiex.matlab</groupId>
-            <artifactId>cxll</artifactId>
-            <version>4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.caiex.matlab</groupId>
-            <artifactId>javabuilder</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.7.2</version>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
@@ -656,36 +511,6 @@
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.7</version>
             </plugin>
-            <!--<plugin>-->
-            <!--<groupId>com.ronnie</groupId>-->
-            <!--<artifactId>check-config-plugin</artifactId>-->
-            <!--<version>1.0-SNAPSHOT</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<phase>compile</phase>-->
-            <!--<goals>-->
-            <!--<goal>checkConfig</goal>-->
-            <!--</goals>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--<configuration>-->
-            <!--<fileAndValidStrs>-->
-            <!--<param>-->
-            <!--${basedir}\src\main\java\com\spider\config\AppConfig.java|//@PropertySource("classpath:config.properties")-->
-            <!--</param>-->
-            <!--<param>-->
-            <!--${basedir}\src\main\resources\log4j.properties|#log4j.appender.info_file.File=e:/spider-robot/info.log-->
-            <!--</param>-->
-            <!--<param>-->
-            <!--${basedir}\src\main\resources\log4j.properties|#log4j.appender.persist_file.File=e:/spider-robot/persist.log-->
-            <!--</param>-->
-            <!--<param>-->
-            <!--${basedir}\src\main\java\com\spider\global\ConfigProperties.java|// properties.load(new-->
-            <!--DefaultResourceLoader().getResource("classpath:config.properties").getInputStream());-->
-            <!--</param>-->
-            <!--</fileAndValidStrs>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.6.1</version>
