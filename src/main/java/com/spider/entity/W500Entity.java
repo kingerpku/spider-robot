@@ -353,4 +353,29 @@ public class W500Entity {
         result = 31 * result + (uniqueId != null ? uniqueId.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+
+        return "W500Entity{" +
+                "id=" + id +
+                ", homeTeam='" + homeTeam + '\'' +
+                ", awayTeam='" + awayTeam + '\'' +
+                ", matchCode=" + matchCode +
+                ", homeRedCard=" + homeRedCard +
+                ", homeYellowCard=" + homeYellowCard +
+                ", awayRedCard=" + awayRedCard +
+                ", awayYellowCard=" + awayYellowCard +
+                ", score='" + score + '\'' +
+                ", halfScore='" + halfScore + '\'' +
+                ", updateTime=" + updateTime +
+                ", durationTime='" + durationTime + '\'' +
+                ", matchTime=" + matchTime +
+                ", hadH=" + hadH +
+                ", hadD=" + hadD +
+                ", hadA=" + hadA +
+                ", half='" + half + '\'' +
+                ", uniqueId=" + uniqueId +
+                '}';
+    }
 }

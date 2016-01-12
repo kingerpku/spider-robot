@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -52,11 +53,16 @@ public class W500Robot implements Runnable {
 
         Date start = new Date();
         try {
-            webClient.setJavaScriptTimeout(3000);
             HtmlPage page1 = webClient.getPage(getUrl(new Date()));
-            parse(page1);
+            webClient.setJavaScriptTimeout(5000);
+            List<W500Entity> w500Entities1 = parse(page1);
             HtmlPage page2 = webClient.getPage(getUrl(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))));
-            parse(page2);
+            webClient.setJavaScriptTimeout(5000);
+            List<W500Entity> w500Entities2 = parse(page2);
+            w500Entities1.addAll(w500Entities2);
+            for (W500Entity w500Entity : w500Entities1) {
+                w500Dao.saveOrUpdate(w500Entity);
+            }
             Date end = new Date();
             heartBeatService.heartBeat(ServiceName.W500.getName(), start, end, true, null);
         } catch (Exception e) {
@@ -67,10 +73,11 @@ public class W500Robot implements Runnable {
         }
     }
 
-    private void parse(HtmlPage page) {
+    public static List<W500Entity> parse(HtmlPage page) {
 
         HtmlTable table = (HtmlTable) page.getByXPath("//*[@id=\"table_match\"]").get(0);
         List<HtmlTableRow> trs = (List<HtmlTableRow>) table.getByXPath("tbody/tr");
+        List<W500Entity> w500Entities = new ArrayList<>();
         for (HtmlTableRow tr : trs) {
             W500Entity w500Entity = new W500Entity();
             String matchCode = tr.getAttribute("order");
@@ -83,11 +90,12 @@ public class W500Robot implements Runnable {
             setCards(tr, w500Entity);
             setOdds(tr, w500Entity);
             w500Entity.setUniqueId(RobotUtils.getUniqueMatchId(w500Entity.getMatchTime(), w500Entity.getMatchCode() + ""));
-            w500Dao.saveOrUpdate(w500Entity);
+            w500Entities.add(w500Entity);
         }
+        return w500Entities;
     }
 
-    private void setOdds(HtmlTableRow tr, W500Entity w500Entity) {
+    private static void setOdds(HtmlTableRow tr, W500Entity w500Entity) {
 
         String hadH = ((DomText) tr.getByXPath("td[10]/span[1]/text()").get(0)).getWholeText();
         String hadD = ((DomText) tr.getByXPath("td[10]/span[2]/text()").get(0)).getWholeText();
@@ -103,7 +111,7 @@ public class W500Robot implements Runnable {
         }
     }
 
-    private void setTeams(HtmlTableRow tr, W500Entity w500Entity) {
+    private static void setTeams(HtmlTableRow tr, W500Entity w500Entity) {
 
         String teams = tr.getAttribute("gy");
         String homeTeam = teams.split(",")[1];
@@ -112,7 +120,7 @@ public class W500Robot implements Runnable {
         w500Entity.setAwayTeam(awayTeam);
     }
 
-    private void setDurationTime(HtmlTableRow tr, W500Entity w500Entity) {
+    private static void setDurationTime(HtmlTableRow tr, W500Entity w500Entity) {
 
         String time = tr.getAttribute("time");
         List<DomText> durationTimeList = (List<DomText>) tr.getByXPath("td[5]/text()");
@@ -132,14 +140,14 @@ public class W500Robot implements Runnable {
         w500Entity.setDurationTime(durationTime);
     }
 
-    private void setMatchTime(HtmlTableRow tr, W500Entity w500Entity) {
+    private static void setMatchTime(HtmlTableRow tr, W500Entity w500Entity) {
 
         String matchTime = ((DomText) tr.getByXPath("td[4]/text()").get(0)).getWholeText();
         Date startTime = DateUtils.parseDateFormat(Calendar.getInstance().get(Calendar.YEAR) + "-" + matchTime, "yyy-MM-dd HH:mm");
         w500Entity.setMatchTime(new Timestamp(startTime.getTime()));
     }
 
-    private void setScore(HtmlTableRow tr, W500Entity w500Entity) {
+    private static void setScore(HtmlTableRow tr, W500Entity w500Entity) {
 
         List<DomText> scoreHomeList = (List<DomText>) tr.getByXPath("td[7]/div/a[1]/text()");
         String scoreHome;
@@ -161,7 +169,7 @@ public class W500Robot implements Runnable {
         w500Entity.setHalfScore(halfScore.replaceAll("\\s", ""));
     }
 
-    private void setCards(HtmlTableRow tr, W500Entity w500Entity) {
+    private static void setCards(HtmlTableRow tr, W500Entity w500Entity) {
 
         Integer homeRedCard = getCardNumber(tr, "td[6]/span[@class='redcard']/text()");
         w500Entity.setHomeRedCard(homeRedCard);
@@ -173,7 +181,7 @@ public class W500Robot implements Runnable {
         w500Entity.setAwayYellowCard(awayYellowCard);
     }
 
-    private Integer getCardNumber(HtmlTableRow tr, String xpath) {
+    private static Integer getCardNumber(HtmlTableRow tr, String xpath) {
 
         List<DomText> cardList = (List<DomText>) tr.getByXPath(xpath);
         Integer homeRedCard;
