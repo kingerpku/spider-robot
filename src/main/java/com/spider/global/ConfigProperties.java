@@ -20,8 +20,8 @@ public final class ConfigProperties {
     static {
         Properties properties = new Properties();
         try {
-            //properties.load(new DefaultResourceLoader().getResource("file:/opt/spider/config.properties").getInputStream());
-            properties.load(new DefaultResourceLoader().getResource("classpath:config.properties").getInputStream());
+            properties.load(new DefaultResourceLoader().getResource("file:/opt/spider/config.properties").getInputStream());
+            //properties.load(new DefaultResourceLoader().getResource("classpath:config.properties").getInputStream());
         } catch (IOException e) {
             throw new RuntimeException("config file error");
         }
