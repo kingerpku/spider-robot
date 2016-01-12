@@ -6,8 +6,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
- * 主程序入口，初始化spring容器
- * Created by wsy on 2015/10/14.
+ * 主程序入口，初始化spring容器，加载com.spider.robot.Starter后会启动抓取任务
+ * 启动任务逻辑在{@link com.spider.robot.Starter}中
  *
  * @author wsy
  */
