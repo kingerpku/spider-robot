@@ -7,6 +7,8 @@ import java.io.IOException;
 
 /**
  * Created by wsy on 2015/11/4.
+ *
+ * @author wsy
  */
 public class CopyJar {
 
