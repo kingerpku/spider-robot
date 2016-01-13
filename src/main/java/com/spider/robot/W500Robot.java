@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by wsy on 2016/1/7.
@@ -51,32 +52,38 @@ public class W500Robot implements Runnable {
 
         Date start = new Date();
         try {
-            HtmlPage page = webClient.getPage(getUrl());
-            webClient.waitForBackgroundJavaScript(5000);
-            HtmlTable table = (HtmlTable) page.getByXPath("//*[@id=\"table_match\"]").get(0);
-            List<HtmlTableRow> trs = (List<HtmlTableRow>) table.getByXPath("tbody/tr");
-            for (HtmlTableRow tr : trs) {
-                W500Entity w500Entity = new W500Entity();
-                String matchCode = tr.getAttribute("order");
-                w500Entity.setMatchCode(Integer.valueOf(matchCode));
-                setTeams(tr, w500Entity);
-                setDurationTime(tr, w500Entity);
-                setScore(tr, w500Entity);
-                setMatchTime(tr, w500Entity);
-                w500Entity.setUpdateTime(new Timestamp(System.currentTimeMillis()));
-                setCards(tr, w500Entity);
-                setOdds(tr, w500Entity);
-                w500Entity.setUniqueId(RobotUtils.getUniqueMatchId(w500Entity.getMatchTime(), w500Entity.getMatchCode() + ""));
-                w500Dao.saveOrUpdate(w500Entity);
-            }
+            webClient.setJavaScriptTimeout(3000);
+            HtmlPage page1 = webClient.getPage(getUrl(new Date()));
+            parse(page1);
+            HtmlPage page2 = webClient.getPage(getUrl(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))));
+            parse(page2);
             Date end = new Date();
             heartBeatService.heartBeat(ServiceName.W500.getName(), start, end, true, null);
         } catch (Exception e) {
-            e.printStackTrace();
             Date end = new Date();
             heartBeatService.heartBeat(ServiceName.W500.getName(), start, end, false, e.getMessage());
         } finally {
             webClient.closeAllWindows();
+        }
+    }
+
+    private void parse(HtmlPage page) {
+
+        HtmlTable table = (HtmlTable) page.getByXPath("//*[@id=\"table_match\"]").get(0);
+        List<HtmlTableRow> trs = (List<HtmlTableRow>) table.getByXPath("tbody/tr");
+        for (HtmlTableRow tr : trs) {
+            W500Entity w500Entity = new W500Entity();
+            String matchCode = tr.getAttribute("order");
+            w500Entity.setMatchCode(Integer.valueOf(matchCode));
+            setTeams(tr, w500Entity);
+            setDurationTime(tr, w500Entity);
+            setScore(tr, w500Entity);
+            setMatchTime(tr, w500Entity);
+            w500Entity.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+            setCards(tr, w500Entity);
+            setOdds(tr, w500Entity);
+            w500Entity.setUniqueId(RobotUtils.getUniqueMatchId(w500Entity.getMatchTime(), w500Entity.getMatchCode() + ""));
+            w500Dao.saveOrUpdate(w500Entity);
         }
     }
 
@@ -107,15 +114,18 @@ public class W500Robot implements Runnable {
 
     private void setDurationTime(HtmlTableRow tr, W500Entity w500Entity) {
 
+        String time = tr.getAttribute("time");
         List<DomText> durationTimeList = (List<DomText>) tr.getByXPath("td[5]/text()");
-        String durationTime;
+        String durationTime = "";
         String wholeText = "";
         if (durationTimeList.size() != 0) {
             wholeText = durationTimeList.get(0).getWholeText();
         }
         if (wholeText.equals("") || (!wholeText.contains("未") && !wholeText.matches(".*\\d.*"))) {
             durationTimeList = (List<DomText>) tr.getByXPath("td[5]/span/text()");
-            durationTime = wholeText;//rtodo
+            if (durationTimeList.size() != 0) {
+                durationTime = durationTimeList.get(0).getWholeText();//rtodo
+            }
         } else {
             durationTime = wholeText;
         }
@@ -175,8 +185,8 @@ public class W500Robot implements Runnable {
         return homeRedCard;
     }
 
-    private String getUrl() {
+    private String getUrl(Date date) {
 
-        return url + DateUtils.format(new Date(), "yyyy-MM-dd");
+        return url + DateUtils.format(date, "yyyy-MM-dd");
     }
 }
