@@ -341,6 +341,8 @@ public class StatisticRobot implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
+            }finally {
+                webClientJs.closeAllWindows();
             }
             try {
                 goKeyEvent(europeId, htmlPage);

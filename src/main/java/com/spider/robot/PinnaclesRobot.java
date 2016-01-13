@@ -40,42 +40,50 @@ public class PinnaclesRobot implements Runnable {
 
     public List<Sport> getSports() throws IOException {
 
-        XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/sports");
-        List<Node> sportNodes = null;
         List<Sport> sports = new ArrayList<>();
         try {
-            sportNodes = XmlUtils.selectNodes(xmlPage.getContent(), "//sport");
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
-        for (Node node : sportNodes) {
-            Sport sport = new Sport();
-            sport.setName(node.getText());
-            sport.setSportId(Integer.valueOf(node.valueOf("@id")));
-            sports.add(sport);
+            XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/sports");
+            List<Node> sportNodes = null;
+            try {
+                sportNodes = XmlUtils.selectNodes(xmlPage.getContent(), "//sport");
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+            for (Node node : sportNodes) {
+                Sport sport = new Sport();
+                sport.setName(node.getText());
+                sport.setSportId(Integer.valueOf(node.valueOf("@id")));
+                sports.add(sport);
+            }
+        } finally {
+            webClient.closeAllWindows();
         }
         return sports;
     }
 
     public List<PinnacleEntity> getPinnacles() throws IOException, DocumentException, ParseException {
 
-        XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/feed?sportid=29&oddsformat=1&last=" + lastOddsUpdateTime);
-        String xml = xmlPage.getContent();
-        List<Node> nodes = XmlUtils.selectNodes(xml, "//league");
         List<PinnacleEntity> entities = new ArrayList<>();
-        lastOddsUpdateTime = Long.parseLong(XmlUtils.selectNode(xml, "//fdTime").getText());
-        int count = 0;
-        for (Node node : nodes) {
-            List<Node> eventNodes = node.selectNodes("events/event");
-            for (Node eventNode : eventNodes) {
-                Date startDateTime = DateUtils.parseDate(eventNode.valueOf("startDateTime").replace('T', ' ').replaceAll("Z", ""), "yyyy-MM-dd HH:mm:ss");
-                if (startDateTime.after(DateUtils.addDays(new Date(), 2))) {
-                    System.out.println(++count);
-                    continue;
+        try {
+            XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/feed?sportid=29&oddsformat=1&last=" + lastOddsUpdateTime);
+            String xml = xmlPage.getContent();
+            List<Node> nodes = XmlUtils.selectNodes(xml, "//league");
+            lastOddsUpdateTime = Long.parseLong(XmlUtils.selectNode(xml, "//fdTime").getText());
+            int count = 0;
+            for (Node node : nodes) {
+                List<Node> eventNodes = node.selectNodes("events/event");
+                for (Node eventNode : eventNodes) {
+                    Date startDateTime = DateUtils.parseDate(eventNode.valueOf("startDateTime").replace('T', ' ').replaceAll("Z", ""), "yyyy-MM-dd HH:mm:ss");
+                    if (startDateTime.after(DateUtils.addDays(new Date(), 2))) {
+                        System.out.println(++count);
+                        continue;
+                    }
+                    PinnacleEntity event = parseEvent(eventNode, Integer.valueOf(node.valueOf("id")), startDateTime);
+                    entities.add(event);
                 }
-                PinnacleEntity event = parseEvent(eventNode, Integer.valueOf(node.valueOf("id")), startDateTime);
-                entities.add(event);
             }
+        } finally {
+            webClient.closeAllWindows();
         }
         return entities;
     }
@@ -100,14 +108,18 @@ public class PinnaclesRobot implements Runnable {
 
     public List<PinnacleLeague> getLeagues() throws IOException, DocumentException {
 
-        XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/leagues?sportid=29");
         List<PinnacleLeague> list = new ArrayList<>();
-        List<Node> nodes = XmlUtils.selectNodes(xmlPage.getContent(), "//league");
-        for (Node node : nodes) {
-            PinnacleLeague league = new PinnacleLeague();
-            league.setLeagueId(Integer.valueOf(node.valueOf("@id")));
-            league.setName(node.getText());
-            list.add(league);
+        try {
+            XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/leagues?sportid=29");
+            List<Node> nodes = XmlUtils.selectNodes(xmlPage.getContent(), "//league");
+            for (Node node : nodes) {
+                PinnacleLeague league = new PinnacleLeague();
+                league.setLeagueId(Integer.valueOf(node.valueOf("@id")));
+                league.setName(node.getText());
+                list.add(league);
+            }
+        } finally {
+            webClient.closeAllWindows();
         }
         return list;
     }
