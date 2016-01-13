@@ -203,63 +203,67 @@ public class Win310AndSportteryUtils {
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setCssEnabled(false);
-        String url = null;
-        if (JINBAOBO_NAME.equals(companyName)) {
-            url = MessageFormat.format(jinbaoboPageUrlTemplate, europeId);
-        } else if (LIJI_NAME.equals(companyName)) {
-            url = MessageFormat.format(lijiPageUrlTemplate, europeId);
-        }
-        HtmlPage htmlPage = webClient.getPage(url);
         Map<Integer, List<CompanyOddsEntity>> result = new HashMap<>();
-        List<HtmlTable> tables = (List<HtmlTable>) htmlPage.getByXPath("//table[@class='gts']");
-        if (tables.size() == 0) {
-            return result;
-        }
-
-        for (int i = 0; i < tables.size(); i++) {
-            List<CompanyOddsEntity> list = Lists.newArrayList();
-            List<HtmlTableRow> trs = tables.get(i).getRows();
-            for (int j = 2; j < trs.size(); j++) {// 第一行是表头，越过
-                CompanyOddsEntity odds = new CompanyOddsEntity();
-                HtmlTableRow tr = trs.get(j);
-                String score = ((DomText) tr.getByXPath("td[2]/text()").get(0)).getWholeText();
-                if (score.contains("比分")) {
-                    continue;
-                } else {
-                    odds.setScore(score);
-                }
-                List<?> redCards = tr.getByXPath("td[2]/font");
-                if (redCards.size() == 1) {
-                    //rtodo 主队的红牌还是客队的红牌
-                } else if (redCards.size() == 2) {
-                    odds.setHomeRedCard(Integer.valueOf(((HtmlFont) redCards.get(0)).asText()));
-                    odds.setAwayRedCard(Integer.valueOf(((HtmlFont) redCards.get(1)).asText()));
-                } else {
-                    odds.setHomeRedCard(0);
-                    odds.setAwayRedCard(0);
-                }
-                String durationTime = "";
-                List<?> durationTimeList = tr.getByXPath("td[1]/text()");
-                if (durationTimeList.size() != 0) {
-                    durationTime = ((DomText) durationTimeList.get(0)).getWholeText();
-                }
-                String odds1 = getOdds(tr, "td[3]/text()");
-                String odds2 = getOdds(tr, "td[4]/text()");
-                String odds3 = getOdds(tr, "td[5]/text()");
-                String updateTime = ((HtmlScript) tr.getByXPath("td[6]/script").get(0)).asText();
-                String state = ((DomText) tr.getByXPath("td[7]/text()").get(0)).getWholeText();
-                odds.setOddsOne(odds1);
-                odds.setOddsTwo(odds2);
-                odds.setOddsThree(odds3);
-                odds.setDurationTime(durationTime);
-                odds.setOddsUpdateTime(dealNowgoalsUpdateTime(updateTime));
-                odds.setState(state);
-                odds.setGamingCompany(companyName);
-                odds.setEuropeId(europeId);
-                odds.setOddsType(i);
-                list.add(odds);
+        try {
+            String url = null;
+            if (JINBAOBO_NAME.equals(companyName)) {
+                url = MessageFormat.format(jinbaoboPageUrlTemplate, europeId);
+            } else if (LIJI_NAME.equals(companyName)) {
+                url = MessageFormat.format(lijiPageUrlTemplate, europeId);
             }
-            result.put(i, list);
+            HtmlPage htmlPage = webClient.getPage(url);
+            List<HtmlTable> tables = (List<HtmlTable>) htmlPage.getByXPath("//table[@class='gts']");
+            if (tables.size() == 0) {
+                return result;
+            }
+
+            for (int i = 0; i < tables.size(); i++) {
+                List<CompanyOddsEntity> list = Lists.newArrayList();
+                List<HtmlTableRow> trs = tables.get(i).getRows();
+                for (int j = 2; j < trs.size(); j++) {// 第一行是表头，越过
+                    CompanyOddsEntity odds = new CompanyOddsEntity();
+                    HtmlTableRow tr = trs.get(j);
+                    String score = ((DomText) tr.getByXPath("td[2]/text()").get(0)).getWholeText();
+                    if (score.contains("比分")) {
+                        continue;
+                    } else {
+                        odds.setScore(score);
+                    }
+                    List<?> redCards = tr.getByXPath("td[2]/font");
+                    if (redCards.size() == 1) {
+                        //rtodo 主队的红牌还是客队的红牌
+                    } else if (redCards.size() == 2) {
+                        odds.setHomeRedCard(Integer.valueOf(((HtmlFont) redCards.get(0)).asText()));
+                        odds.setAwayRedCard(Integer.valueOf(((HtmlFont) redCards.get(1)).asText()));
+                    } else {
+                        odds.setHomeRedCard(0);
+                        odds.setAwayRedCard(0);
+                    }
+                    String durationTime = "";
+                    List<?> durationTimeList = tr.getByXPath("td[1]/text()");
+                    if (durationTimeList.size() != 0) {
+                        durationTime = ((DomText) durationTimeList.get(0)).getWholeText();
+                    }
+                    String odds1 = getOdds(tr, "td[3]/text()");
+                    String odds2 = getOdds(tr, "td[4]/text()");
+                    String odds3 = getOdds(tr, "td[5]/text()");
+                    String updateTime = ((HtmlScript) tr.getByXPath("td[6]/script").get(0)).asText();
+                    String state = ((DomText) tr.getByXPath("td[7]/text()").get(0)).getWholeText();
+                    odds.setOddsOne(odds1);
+                    odds.setOddsTwo(odds2);
+                    odds.setOddsThree(odds3);
+                    odds.setDurationTime(durationTime);
+                    odds.setOddsUpdateTime(dealNowgoalsUpdateTime(updateTime));
+                    odds.setState(state);
+                    odds.setGamingCompany(companyName);
+                    odds.setEuropeId(europeId);
+                    odds.setOddsType(i);
+                    list.add(odds);
+                }
+                result.put(i, list);
+            }
+        } finally {
+            webClient.closeAllWindows();
         }
         return result;
     }
@@ -395,17 +399,19 @@ public class Win310AndSportteryUtils {
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setCssEnabled(false);
-        while (count-- >= 0 || min == null) {
-            HtmlPage htmlPage = webClient.getPage("http://live.500.com/");
-            webClient.waitForBackgroundJavaScript(3000);
-            try {
-                min = ((DomText) htmlPage.getByXPath("//table[@id='table_match']/tbody/tr[@order='" + matchCode + "']/td[5]/text()").get(0)).getWholeText();
-            } catch (Exception e) {
-                min = ((DomText) htmlPage.getByXPath("//table[@id='table_match']/tbody/tr[@order='" + matchCode + "']/td[5]/span/text()").get(0)).getWholeText();
+        try {
+            while (count-- >= 0 || min == null) {
+                HtmlPage htmlPage = webClient.getPage("http://live.500.com/");
+                webClient.waitForBackgroundJavaScript(3000);
+                try {
+                    min = ((DomText) htmlPage.getByXPath("//table[@id='table_match']/tbody/tr[@order='" + matchCode + "']/td[5]/text()").get(0)).getWholeText();
+                } catch (Exception e) {
+                    min = ((DomText) htmlPage.getByXPath("//table[@id='table_match']/tbody/tr[@order='" + matchCode + "']/td[5]/span/text()").get(0)).getWholeText();
+                }
             }
+        } finally {
+            webClient.closeAllWindows();
         }
-
-        webClient.closeAllWindows();
         return min.replaceAll("'", "");
     }
 }
