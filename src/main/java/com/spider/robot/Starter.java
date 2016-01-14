@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +29,8 @@ public class Starter {
     private Logger appLogger = Logger.getLogger("app_logger");
 
     private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(8);
+
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Autowired
     @Qualifier("jbbParser")
@@ -68,13 +71,13 @@ public class Starter {
         appLogger.info("lj robot start...");
         scheduleExecutor.scheduleWithFixedDelay(pinnaclesRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
         appLogger.info("pinnacle robot start...");
-        scheduleExecutor.scheduleWithFixedDelay(w500Robot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+        executorService.submit(w500Robot);
         appLogger.info("w500 robot start...");
         scheduleExecutor.scheduleWithFixedDelay(jbbRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
         appLogger.info("jbb robot start...");
         scheduleExecutor.scheduleWithFixedDelay(ljRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
         appLogger.info("lj robot start...");
-        scheduleExecutor.scheduleWithFixedDelay(statisticRobot, INITIAL_DELAY, 5, TimeUnit.MINUTES);
+        scheduleExecutor.scheduleWithFixedDelay(statisticRobot, 0, 5, TimeUnit.MINUTES);
         appLogger.info("statistic robot start...");
     }
 }

@@ -321,6 +321,7 @@ public class W500Entity {
             return false;
         if (score != null ? !score.equals(that.score) : that.score != null) return false;
         if (halfScore != null ? !halfScore.equals(that.halfScore) : that.halfScore != null) return false;
+        if (half != null ? !half.equals(that.half) : that.half != null) return false;
         if (durationTime != null ? !durationTime.equals(that.durationTime) : that.durationTime != null) return false;
         if (matchTime != null ? !matchTime.equals(that.matchTime) : that.matchTime != null) return false;
         if (hadH != null ? !hadH.equals(that.hadH) : that.hadH != null) return false;

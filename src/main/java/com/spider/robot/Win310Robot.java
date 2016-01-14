@@ -57,9 +57,7 @@ public class Win310Robot implements Runnable {
     @Autowired
     private Win310Parser win310Parser;
 
-    private static Logger errorLogger = LogHelper.getErrorLogger();
-
-    private Logger infoLogger = Logger.getLogger("info_logger");
+    private Logger logger = Logger.getLogger("win310_logger");
 
     private static Logger messLogger = LogHelper.getMessLogger();
 
@@ -86,7 +84,7 @@ public class Win310Robot implements Runnable {
 
         Date start = new Date();
         try {
-            infoLogger.info("win310 start at " + System.currentTimeMillis());
+            logger.info("win310 start...");
             FetcherContent fetcherContent = getFetcherContent(pageUrl);
             if (!(fetcherContent != null && fetcherContent.getStatusCode() == HttpStatus.SC_OK)) {
                 return;
@@ -94,7 +92,7 @@ public class Win310Robot implements Runnable {
             String html = fetcherContent.getHtml();
             LogHelper.infoLog(messLogger, null, "win310 fetcher html status_code:{0}", fetcherContent.getStatusCode());
             if (html == null || StringUtils.isEmpty(html.replaceAll(Constants.NBSP_HTML, ""))) {
-                LogHelper.errorLog(infoLogger, null, "win310 main html is null...", "");
+                LogHelper.errorLog(logger, null, "win310 main html is null...", "");
                 Date end = new Date();
                 heartBeatService.heartBeat(ServiceName.Win310Robot.getName(), start, end, false, "win310 main html is null...");
                 return;
@@ -152,7 +150,7 @@ public class Win310Robot implements Runnable {
             }
             return list;
         } catch (Exception e) {
-            LogHelper.errorLog(infoLogger, e, "parser html error", "");
+            LogHelper.error(logger, "parser html error", e);
         }
         return list;
     }
@@ -188,7 +186,7 @@ public class Win310Robot implements Runnable {
         String html = fetcherContent.getHtml();
         LogHelper.infoLog(messLogger, null, "win310 fetcher html status_code:{0}", fetcherContent.getStatusCode());
         if (html == null) {
-            LogHelper.errorLog(errorLogger, null, "win310 main html is null...", "");
+            LogHelper.error(logger, "win310 main html is null...", null);
             return singleSet;
         }
         if (StringUtils.isEmpty(html.replaceAll(Constants.NBSP_HTML, ""))) {
@@ -220,7 +218,7 @@ public class Win310Robot implements Runnable {
                 }
             }
         } catch (Exception e) {
-            LogHelper.errorLog(errorLogger, e, "parser html error", "");
+            LogHelper.error(logger, "parser html error", e);
         }
         return singleSet;
     }

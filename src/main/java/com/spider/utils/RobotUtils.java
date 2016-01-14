@@ -35,16 +35,16 @@ public class RobotUtils {
     /**
      * 根据磁盘html文件生成HtmlPage对象，用于解析
      *
-     * @param path
+     * @param file
      * @param charset
      * @return
      * @throws IOException
      */
-    private static HtmlPage getHtmlPageFromFile(String path, String charset) throws IOException {
+    public static HtmlPage getHtmlPageFromFile(File file, String charset) throws IOException {
 
         WebClient client = new WebClient();
         try {
-            String content = FileUtils.readFileToString(new File(path));
+            String content = FileUtils.readFileToString(file);
             URL url = new URL("http://www.example.com");
             StringWebResponse response = new StringWebResponse(content, charset, url);
             client.getOptions().setJavaScriptEnabled(false);

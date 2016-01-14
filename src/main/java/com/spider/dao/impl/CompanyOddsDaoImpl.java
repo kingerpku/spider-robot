@@ -5,6 +5,7 @@ import com.spider.entity.CompanyOddsEntity;
 import com.spider.entity.CompanyOddsHistoryEntity;
 import com.spider.repository.CompanyOddsHistoryRepository;
 import com.spider.repository.CompanyOddsRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +14,13 @@ import java.util.List;
 
 /**
  * Created by wsy on 2016/1/8.
+ *
+ * @author wsy
  */
 @Repository
 public class CompanyOddsDaoImpl implements CompanyOddsDao {
+
+    private Logger logger = Logger.getLogger("info_logger");
 
     @Autowired
     private CompanyOddsHistoryRepository companyOddsHistoryRepository;
@@ -24,7 +29,6 @@ public class CompanyOddsDaoImpl implements CompanyOddsDao {
     private CompanyOddsRepository companyOddsRepository;
 
     @Override
-    @Transactional
     public void saveOrUpdate(List<CompanyOddsEntity> list, Integer oddsType) {
 
         if (list.size() != 0) {
@@ -46,7 +50,7 @@ public class CompanyOddsDaoImpl implements CompanyOddsDao {
                 }
             } catch (Exception e) {
                 System.out.println(companyOddsEntity);
-                e.printStackTrace();
+                logger.info("[ERROR]", e);
             }
         } else {
             return;
