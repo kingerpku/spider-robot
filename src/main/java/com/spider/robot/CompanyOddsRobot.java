@@ -1,17 +1,20 @@
 package com.spider.robot;
 
-import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import com.google.common.collect.Lists;
 import com.spider.dao.CompanyOddsDao;
 import com.spider.domain.CompanyOddsParam;
 import com.spider.domain.GamingCompany;
 import com.spider.entity.CompanyOddsEntity;
 import com.spider.entity.TCrawlerWin310;
+import com.spider.fetcher.Fetcher;
+import com.spider.fetcher.HttpConfig;
+import com.spider.fetcher.impl.HttpClientFetcherImpl;
+import com.spider.global.Constants;
 import com.spider.global.ServiceName;
 import com.spider.repository.TCrawlerWin310Repository;
 import com.spider.service.HeartBeatService;
 import com.spider.utils.LogHelper;
+import com.spider.utils.RobotUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,13 +36,17 @@ import static com.spider.global.Constants.LIJI_NAME;
 @Component
 public class CompanyOddsRobot implements Runnable {
 
-    private static Logger logger = Logger.getLogger("info_logger");
+    private static Logger logger = Logger.getLogger("company_odds_logger");
 
     private static final String jinbaoboPageUrlTemplate = "http://data.nowgoal.com/3in1odds/" + GamingCompany.JinBaoBo.getId() + "_{0}.html";
 
     private static final String lijiPageUrlTemplate = "http://data.nowgoal.com/3in1odds/" + GamingCompany.LiJi.getId() + "_{0}.html";
 
     private String companyName;
+
+    private Fetcher fetcher = new HttpClientFetcherImpl();
+
+    private HttpConfig httpConfig = new HttpConfig();
 
     @Autowired
     private TCrawlerWin310Repository win310Repository;
@@ -49,15 +56,6 @@ public class CompanyOddsRobot implements Runnable {
 
     @Autowired
     private CompanyOddsDao companyOddsDao;
-
-    private static WebClient webClient = new WebClient();
-
-    {
-//        webClient.getOptions().setJavaScriptEnabled(true);
-        webClient.getOptions().setJavaScriptEnabled(false);
-        webClient.getOptions().setThrowExceptionOnScriptError(false);
-        webClient.getOptions().setCssEnabled(false);
-    }
 
     private BlockingQueue<CompanyOddsParam> blockingQueue = new LinkedBlockingQueue<>();
 
@@ -94,7 +92,7 @@ public class CompanyOddsRobot implements Runnable {
         try {
             CountDownLatch countDownLatch = new CountDownLatch(onSaleMatches.size());
             for (TCrawlerWin310 win310 : onSaleMatches) {
-                executorService.submit(new Runner(win310, countDownLatch));
+                executorService.submit(new HtmlGetter(win310, countDownLatch));
             }
             countDownLatch.await();
             Date end = new Date();
@@ -105,13 +103,13 @@ public class CompanyOddsRobot implements Runnable {
         }
     }
 
-    class Runner implements Runnable {
+    class HtmlGetter implements Runnable {
 
         private final TCrawlerWin310 win310;
 
         private final CountDownLatch countDownLatch;
 
-        public Runner(TCrawlerWin310 win310, CountDownLatch countDownLatch) {
+        public HtmlGetter(TCrawlerWin310 win310, CountDownLatch countDownLatch) {
 
             this.countDownLatch = countDownLatch;
             this.win310 = win310;
@@ -128,19 +126,21 @@ public class CompanyOddsRobot implements Runnable {
                 url = MessageFormat.format(lijiPageUrlTemplate, europeId + "");
             }
             try {
-                HtmlPage htmlPage = webClient.getPage(url);
+                String html = Win310AndSportteryUtils.getOddsHtml(url, new HttpClientFetcherImpl(), httpConfig, Constants.AWS_HTTP_PROXY);
+                HtmlPage htmlPage = RobotUtils.getHtmlPageFromString(html, "gbk");
                 CompanyOddsParam companyOddsParam = new CompanyOddsParam();
                 companyOddsParam.setCompanyName(companyName);
                 companyOddsParam.setEuropeId(europeId);
                 companyOddsParam.setHtmlPage(htmlPage);
                 blockingQueue.put(companyOddsParam);
+                LogHelper.info(logger, "put CompanyOddsParam in blocking queue, europe id is " + companyOddsParam.getEuropeId());
             } catch (IOException e) {
-                logger.info("[ERROR] IOException " + e);
+                LogHelper.error(logger, "IOException", e);
             } catch (InterruptedException e) {
-                logger.info("[ERROR] InterruptedException " + e);
+                LogHelper.error(logger, "InterruptedException", e);
             } finally {
                 countDownLatch.countDown();
-                webClient.closeAllWindows();
+//                webClient.closeAllWindows();
             }
         }
     }
@@ -153,6 +153,7 @@ public class CompanyOddsRobot implements Runnable {
             CompanyOddsParam companyOddsParam;
             try {
                 while ((companyOddsParam = blockingQueue.take()) != null) {
+                    LogHelper.info(logger, "take CompanyOddsParam from blocking queue, europe id is " + companyOddsParam.getEuropeId());
                     Map<Integer, List<CompanyOddsEntity>> map = parseOdds(companyName, companyOddsParam.getEuropeId(), companyOddsParam.getHtmlPage());
                     for (Integer key : map.keySet()) {
                         List<CompanyOddsEntity> oddsList = map.get(key);
@@ -161,92 +162,95 @@ public class CompanyOddsRobot implements Runnable {
                 }
             } catch (InterruptedException e) {
                 logger.info("[ERROR] InterruptedException " + e);
+                executorService.shutdownNow();
+                executorService.submit(new Parser());
+                LogHelper.info(logger, "restart Parser task");
             }
         }
-    }
 
-    public static Map<Integer, List<CompanyOddsEntity>> parseOdds(String companyName, Integer europeId, HtmlPage htmlPage) {
+        public Map<Integer, List<CompanyOddsEntity>> parseOdds(String companyName, Integer europeId, HtmlPage htmlPage) {
 
-        Map<Integer, List<CompanyOddsEntity>> result = new HashMap<>();
+            Map<Integer, List<CompanyOddsEntity>> result = new HashMap<>();
 
-        List<HtmlTable> tables;
-        try {
-            tables = (List<HtmlTable>) htmlPage.getByXPath("//table[@class='gts']");
-            if (tables.size() == 0) {
+            List<HtmlTable> tables;
+            try {
+                tables = (List<HtmlTable>) htmlPage.getByXPath("//table[@class='gts']");
+                if (tables.size() == 0) {
+                    LogHelper.info(logger, "(List<HtmlTable>) htmlPage.getByXPath(\"//table[@class='gts']\"), NO TABLE FOUND");
+                    return result;
+                }
+            } catch (Exception e) {
+                LogHelper.error(logger, "(List<HtmlTable>) htmlPage.getByXPath(\"//table[@class='gts']\")", e);
                 return result;
             }
-        } catch (Exception e) {
-            //rtodo
-            logger.info("[ERROR]" + "", e);
+            for (int i = 0; i < tables.size(); i++) {
+                List<CompanyOddsEntity> list = new LinkedList<>();
+                List<HtmlTableRow> trs = tables.get(i).getRows();
+                for (int j = 2; j < trs.size(); j++) {
+                    CompanyOddsEntity odds = new CompanyOddsEntity();
+                    HtmlTableRow tr = trs.get(j);
+                    String score = ((DomText) tr.getByXPath("td[2]/text()").get(0)).getWholeText();
+                    if (score.contains("比分")) {
+                        continue;
+                    } else {
+                        odds.setScore(score);
+                    }
+                    List<?> redCards = tr.getByXPath("td[2]/font");
+                    if (redCards.size() == 1) {
+                        HtmlFont cardFont = (HtmlFont) redCards.get(0);
+                        if (cardFont.getNextSibling() == null) {
+                            odds.setHomeRedCard(Integer.valueOf(cardFont.asText()));
+                        } else {
+                            odds.setAwayRedCard(Integer.valueOf(cardFont.asText()));
+                        }
+                    } else if (redCards.size() == 2) {
+                        odds.setHomeRedCard(Integer.valueOf(((HtmlFont) redCards.get(0)).asText()));
+                        odds.setAwayRedCard(Integer.valueOf(((HtmlFont) redCards.get(1)).asText()));
+                    } else {
+                        odds.setHomeRedCard(0);
+                        odds.setAwayRedCard(0);
+                    }
+                    String durationTime = "";
+                    List<?> durationTimeList = tr.getByXPath("td[1]/text()");
+                    if (durationTimeList.size() != 0) {
+                        durationTime = ((DomText) durationTimeList.get(0)).getWholeText();
+                    }
+                    String odds1 = getOdds(tr, "td[3]/text()");
+                    String odds2 = getOdds(tr, "td[4]/text()");
+                    String odds3 = getOdds(tr, "td[5]/text()");
+                    String updateTime = ((HtmlScript) tr.getByXPath("td[6]/script").get(0)).getTextContent();
+                    String state = ((DomText) tr.getByXPath("td[7]/text()").get(0)).getWholeText();
+                    odds.setOddsOne(odds1);
+                    odds.setOddsTwo(odds2);
+                    odds.setOddsThree(odds3);
+                    odds.setDurationTime(durationTime);
+                    odds.setOddsUpdateTime(dealNowgoalsUpdateTime(updateTime));
+                    odds.setState(state.replaceAll("\\s*", ""));
+                    odds.setGamingCompany(companyName);
+                    odds.setEuropeId(europeId);
+                    odds.setOddsType(i);
+                    LogHelper.info(logger, "parse company odds, " + odds);
+                    list.add(odds);
+                }
+                result.put(i, list);
+            }
             return result;
         }
-        for (int i = 0; i < tables.size(); i++) {
-            List<CompanyOddsEntity> list = new LinkedList<>();
-            List<HtmlTableRow> trs = tables.get(i).getRows();
-            for (int j = 2; j < trs.size(); j++) {
-                CompanyOddsEntity odds = new CompanyOddsEntity();
-                HtmlTableRow tr = trs.get(j);
-                String score = ((DomText) tr.getByXPath("td[2]/text()").get(0)).getWholeText();
-                if (score.contains("比分")) {
-                    continue;
-                } else {
-                    odds.setScore(score);
-                }
-                List<?> redCards = tr.getByXPath("td[2]/font");
-                if (redCards.size() == 1) {
-                    HtmlFont cardFont = (HtmlFont) redCards.get(0);
-                    if (cardFont.getNextSibling() == null) {
-                        odds.setHomeRedCard(Integer.valueOf(cardFont.asText()));
-                    } else {
-                        odds.setAwayRedCard(Integer.valueOf(cardFont.asText()));
-                    }
-                } else if (redCards.size() == 2) {
-                    odds.setHomeRedCard(Integer.valueOf(((HtmlFont) redCards.get(0)).asText()));
-                    odds.setAwayRedCard(Integer.valueOf(((HtmlFont) redCards.get(1)).asText()));
-                } else {
-                    odds.setHomeRedCard(0);
-                    odds.setAwayRedCard(0);
-                }
-                String durationTime = "";
-                List<?> durationTimeList = tr.getByXPath("td[1]/text()");
-                if (durationTimeList.size() != 0) {
-                    durationTime = ((DomText) durationTimeList.get(0)).getWholeText();
-                }
-                String odds1 = getOdds(tr, "td[3]/text()");
-                String odds2 = getOdds(tr, "td[4]/text()");
-                String odds3 = getOdds(tr, "td[5]/text()");
-                String updateTime = ((HtmlScript) tr.getByXPath("td[6]/script").get(0)).getTextContent();
-                String state = ((DomText) tr.getByXPath("td[7]/text()").get(0)).getWholeText();
-                odds.setOddsOne(odds1);
-                odds.setOddsTwo(odds2);
-                odds.setOddsThree(odds3);
-                odds.setDurationTime(durationTime);
-                odds.setOddsUpdateTime(dealNowgoalsUpdateTime(updateTime));
-                odds.setState(state.replaceAll("\\s*", ""));
-                odds.setGamingCompany(companyName);
-                odds.setEuropeId(europeId);
-                odds.setOddsType(i);
-                list.add(odds);
+
+        private String getOdds(HtmlTableRow tr, String xpath) {
+
+            String odds = "";
+            List<?> oddsAList = tr.getByXPath(xpath);
+            if (oddsAList.size() != 0) {
+                odds = ((DomText) oddsAList.get(0)).getWholeText();
             }
-            result.put(i, list);
+            return odds;
         }
-        return result;
-    }
 
-    private static String getOdds(HtmlTableRow tr, String xpath) {
+        private String dealNowgoalsUpdateTime(String updateTime) {
 
-        String odds = "";
-        List<?> oddsAList = tr.getByXPath(xpath);
-        if (oddsAList.size() != 0) {
-            odds = ((DomText) oddsAList.get(0)).getWholeText();
+            updateTime = updateTime.replaceAll("showDate\\(", "").replaceAll("\\)", "");
+            return updateTime;
         }
-        return odds;
     }
-
-    private static String dealNowgoalsUpdateTime(String updateTime) {
-
-        updateTime = updateTime.replaceAll("showDate\\(", "").replaceAll("\\)", "");
-        return updateTime;
-    }
-
 }

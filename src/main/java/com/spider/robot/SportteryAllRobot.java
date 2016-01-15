@@ -51,8 +51,6 @@ public class SportteryAllRobot implements Runnable {
 
     private HttpConfig httpConfig = new HttpConfig();
 
-    private ScheduledExecutorService scheduleExecutor = Executors.newSingleThreadScheduledExecutor();
-
     @Autowired
     private HeartBeatService heartBeatService;
 

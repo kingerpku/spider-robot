@@ -53,4 +53,16 @@ public class RobotUtils {
             client.closeAllWindows();
         }
     }
+    public static HtmlPage getHtmlPageFromString(String content, String charset) throws IOException {
+
+        WebClient client = new WebClient();
+        try {
+            URL url = new URL("http://www.example.com");
+            StringWebResponse response = new StringWebResponse(content, charset, url);
+            client.getOptions().setJavaScriptEnabled(false);
+            return HTMLParser.parseHtml(response, client.getCurrentWindow());
+        } finally {
+            client.closeAllWindows();
+        }
+    }
 }

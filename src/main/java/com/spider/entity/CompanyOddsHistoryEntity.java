@@ -272,4 +272,25 @@ public class CompanyOddsHistoryEntity {
         result = 31 * result + (awayRedCard != null ? awayRedCard.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+
+        return "CompanyOddsHistoryEntity{" +
+                "id=" + id +
+                ", europeId=" + europeId +
+                ", gamingCompany='" + gamingCompany + '\'' +
+                ", oddsOne='" + oddsOne + '\'' +
+                ", oddsTwo='" + oddsTwo + '\'' +
+                ", oddsThree='" + oddsThree + '\'' +
+                ", updateTime=" + updateTime +
+                ", oddsUpdateTime='" + oddsUpdateTime + '\'' +
+                ", state='" + state + '\'' +
+                ", score='" + score + '\'' +
+                ", durationTime='" + durationTime + '\'' +
+                ", homeRedCard=" + homeRedCard +
+                ", awayRedCard=" + awayRedCard +
+                ", oddsType=" + oddsType +
+                '}';
+    }
 }

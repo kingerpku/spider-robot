@@ -28,8 +28,6 @@ public class Starter {
 
     public static final int INITIAL_DELAY = 5;
 
-    private Logger appLogger = Logger.getLogger("app_logger");
-
     private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(8);
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -81,11 +79,11 @@ public class Starter {
             System.out.println("win310 robot start...");
         }
         if (args.contains("jbb3")) {
-            scheduleExecutor.scheduleWithFixedDelay(jbbParser, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(jbbParser, 0, 60, TimeUnit.SECONDS);
             System.out.println("jbb robot start...");
         }
         if (args.contains("lj3")) {
-            scheduleExecutor.scheduleWithFixedDelay(ljParser, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(ljParser, 30, 60, TimeUnit.SECONDS);
             System.out.println("lj robot start...");
         }
         if (args.contains("pinnacle")) {
@@ -97,11 +95,11 @@ public class Starter {
             System.out.println("w500 robot start...");
         }
         if (args.contains("jbb")) {
-            scheduleExecutor.scheduleWithFixedDelay(jbbRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(jbbRobot, 0, 100, TimeUnit.SECONDS);
             System.out.println("jbb robot start...");
         }
         if (args.contains("lj")) {
-            scheduleExecutor.scheduleWithFixedDelay(ljRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(ljRobot, 30, 100, TimeUnit.SECONDS);
             System.out.println("lj robot start...");
         }
         if (args.contains("statistic")) {

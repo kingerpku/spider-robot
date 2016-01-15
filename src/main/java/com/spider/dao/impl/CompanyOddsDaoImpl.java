@@ -5,6 +5,7 @@ import com.spider.entity.CompanyOddsEntity;
 import com.spider.entity.CompanyOddsHistoryEntity;
 import com.spider.repository.CompanyOddsHistoryRepository;
 import com.spider.repository.CompanyOddsRepository;
+import com.spider.utils.LogHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,7 @@ import java.util.List;
 @Repository
 public class CompanyOddsDaoImpl implements CompanyOddsDao {
 
-    private Logger logger = Logger.getLogger("info_logger");
+    private Logger logger = Logger.getLogger("company_odds_logger");
 
     @Autowired
     private CompanyOddsHistoryRepository companyOddsHistoryRepository;
@@ -39,20 +40,26 @@ public class CompanyOddsDaoImpl implements CompanyOddsDao {
                             companyOddsEntity.getEuropeId(), oddsType, companyOddsEntity.getGamingCompany());
                     if (query == null) {
                         companyOddsRepository.save(companyOddsEntity);
-                        companyOddsHistoryRepository.save(new CompanyOddsHistoryEntity(companyOddsEntity));
+                        LogHelper.persist(logger, "save companyOddsEntity, " + companyOddsEntity);
+                        CompanyOddsHistoryEntity companyOddsHistoryEntity = new CompanyOddsHistoryEntity(companyOddsEntity);
+                        companyOddsHistoryRepository.save(companyOddsHistoryEntity);
+                        LogHelper.persist(logger, "save companyOddsHistoryEntity, " + companyOddsHistoryEntity);
                     } else {
                         if (!query.equals(companyOddsEntity)) {
                             companyOddsEntity.setId(query.getId());
                             companyOddsRepository.save(companyOddsEntity);
-                            companyOddsHistoryRepository.save(new CompanyOddsHistoryEntity(query));
+                            LogHelper.persist(logger, "update companyOddsEntity, " + companyOddsEntity);
+                            CompanyOddsHistoryEntity companyOddsHistoryEntity = new CompanyOddsHistoryEntity(query);
+                            companyOddsHistoryRepository.save(companyOddsHistoryEntity);
+                            LogHelper.persist(logger, "save companyOddsHistoryEntity, " + companyOddsHistoryEntity);
                         }
                     }
                 }
             } catch (Exception e) {
-                System.out.println(companyOddsEntity);
-                logger.info("[ERROR]", e);
+                LogHelper.error(logger, "Exception", e);
             }
         } else {
+            LogHelper.persist(logger, "same as odds in database");
             return;
         }
     }

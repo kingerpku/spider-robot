@@ -7,6 +7,7 @@ import com.spider.dao.StatisticDao;
 import com.spider.entity.*;
 import com.spider.global.EventType;
 import com.spider.repository.*;
+import com.spider.utils.LogHelper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class StatisticRobot implements Runnable {
 
     public static final int AWAY_TEAM_TYPE = 2;
 
-    public static final String ERROR = "[ERROR]";
+    public static final String ERROR = "[ERROR]-";
 
     private Logger logger = Logger.getLogger("info_logger");
 
@@ -333,10 +334,11 @@ public class StatisticRobot implements Runnable {
             int europeId = Integer.parseInt(win310.getWin310EuropeId());
             //各个方法相关性不大，一个抛异常不应该影响另一个，而且暂时没有必要拆成多线程，so，每个方法一个try catch
             HtmlPage htmlPage;
+            String url = "http://www.nowgoal.com/detail/" + europeId + ".html";
             try {
-                htmlPage = webClient.getPage("http://www.nowgoal.com/detail/" + europeId + ".html");
+                htmlPage = webClient.getPage(url);
             } catch (IOException e) {
-                e.printStackTrace();
+                LogHelper.error(logger, "get " + url, e);
                 return;
             } finally {
                 webClientJs.closeAllWindows();
@@ -344,22 +346,22 @@ public class StatisticRobot implements Runnable {
             try {
                 goKeyEvent(europeId, htmlPage);
             } catch (Exception e) {
-                logger.info(ERROR + "key events error, europe id is " + europeId, e);
+                logger.info(ERROR + "key events error, url " + url, e);
             }
             try {
                 goMatchStatistics(europeId, htmlPage);
             } catch (Exception e) {
-                logger.info(ERROR + "match statistics error, europe id is " + europeId, e);
+                logger.info(ERROR + "match statistics error, url " + url, e);
             }
             try {
                 goPlayersInfo(europeId, htmlPage);
             } catch (Exception e) {
-                logger.info(ERROR + "players info error, europe id is " + europeId, e);
+                logger.info(ERROR + "players info error, url " + url, e);
             }
             try {
                 goMatchInfo(europeId, htmlPage);
             } catch (Exception e) {
-                logger.info(ERROR + "match info error, europe id is " + europeId, e);
+                logger.info(ERROR + "match info error, url " + url, e);
             }
         }
     }
