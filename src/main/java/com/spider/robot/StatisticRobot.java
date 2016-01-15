@@ -3,6 +3,7 @@ package com.spider.robot;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
+import com.spider.dao.StatisticDao;
 import com.spider.entity.*;
 import com.spider.global.EventType;
 import com.spider.repository.*;
@@ -10,6 +11,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -40,13 +42,13 @@ public class StatisticRobot implements Runnable {
     private NowgoalKeyEventRepository nowgoalKeyEventRepository;
 
     @Autowired
-    private NowgoalMatchStatisticRepository nowgoalMatchStatisticRepository;
-
-    @Autowired
     private NowgoalMatchPlayersRepository nowgoalMatchPlayersRepository;
 
     @Autowired
     private NowgoalMatchRepository nowgoalMatchRepository;
+
+    @Autowired
+    private StatisticDao statisticDao;
 
     private static WebClient webClient = new WebClient(BrowserVersion.CHROME);
 
@@ -179,13 +181,8 @@ public class StatisticRobot implements Runnable {
 
     private void goMatchStatistics(int europeId, HtmlPage htmlPage) throws IOException {
 
-        if (nowgoalMatchStatisticRepository.findByMatchId((long) europeId).size() != 0) {
-            return;
-        }
         List<NowgoalMatchStatisticEntity> statisticEntities = getNowgoalMatchStatisticEntities(europeId, htmlPage);
-        for (NowgoalMatchStatisticEntity statisticEntity : statisticEntities) {
-            nowgoalMatchStatisticRepository.save(statisticEntity);
-        }
+        statisticDao.updateMatchStatistic(europeId, statisticEntities);
     }
 
     private static List<NowgoalMatchStatisticEntity> getNowgoalMatchStatisticEntities(int europeId, HtmlPage htmlPage) throws IOException {
@@ -337,11 +334,11 @@ public class StatisticRobot implements Runnable {
             //各个方法相关性不大，一个抛异常不应该影响另一个，而且暂时没有必要拆成多线程，so，每个方法一个try catch
             HtmlPage htmlPage;
             try {
-                htmlPage = webClientJs.getPage("http://www.nowgoal.com/detail/" + europeId + ".html");
+                htmlPage = webClient.getPage("http://www.nowgoal.com/detail/" + europeId + ".html");
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
-            }finally {
+            } finally {
                 webClientJs.closeAllWindows();
             }
             try {

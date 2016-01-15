@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -26,6 +27,8 @@ import static com.spider.global.Constants.LIJI_NAME;
 
 /**
  * Created by wsy on 2016/1/8.
+ *
+ * @author wsy
  */
 @Component
 public class CompanyOddsRobot implements Runnable {
@@ -50,14 +53,17 @@ public class CompanyOddsRobot implements Runnable {
     private static WebClient webClient = new WebClient();
 
     {
-        webClient.getOptions().setJavaScriptEnabled(true);
+//        webClient.getOptions().setJavaScriptEnabled(true);
+        webClient.getOptions().setJavaScriptEnabled(false);
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setCssEnabled(false);
     }
 
     private BlockingQueue<CompanyOddsParam> blockingQueue = new LinkedBlockingQueue<>();
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(20);
+    private ExecutorService singleExecutorService = Executors.newSingleThreadExecutor();
+
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     public CompanyOddsRobot() {
 
@@ -68,11 +74,16 @@ public class CompanyOddsRobot implements Runnable {
         this.companyName = companyName;
     }
 
+    @PostConstruct
+    public void startParse() {
+
+        singleExecutorService.submit(new Parser());
+    }
+
     @Override
     public void run() {
 
         Date start = new Date();
-        executorService.submit(new Parser());
         List<TCrawlerWin310> onSaleMatches = win310Repository.findOnSaleMatches();
         String serviceName = null;
         if (JINBAOBO_NAME.equals(companyName)) {
@@ -124,9 +135,9 @@ public class CompanyOddsRobot implements Runnable {
                 companyOddsParam.setHtmlPage(htmlPage);
                 blockingQueue.put(companyOddsParam);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.info("[ERROR] IOException " + e);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.info("[ERROR] InterruptedException " + e);
             } finally {
                 countDownLatch.countDown();
                 webClient.closeAllWindows();
@@ -149,7 +160,7 @@ public class CompanyOddsRobot implements Runnable {
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.info("[ERROR] InterruptedException " + e);
             }
         }
     }

@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Table(name = "nowgoal_match_statistic", schema = "", catalog = "crawler")
 public class NowgoalMatchStatisticEntity {
 
-    private long id;
+    private Long id;
 
     private long matchId;
 
@@ -23,13 +23,14 @@ public class NowgoalMatchStatisticEntity {
     private Timestamp updateTime;
 
     @Id
+    @GeneratedValue
     @Column(name = "id")
-    public long getId() {
+    public Long getId() {
 
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
 
         this.id = id;
     }

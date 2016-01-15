@@ -1,6 +1,6 @@
 /**
  * @Description
- * @auth guowang  
+ * @auth guowang
  * @time 2014-7-23
  */
 package com.spider.utils;
@@ -13,6 +13,27 @@ import org.apache.log4j.Logger;
  * @author guowang
  */
 public class LogHelper {
+
+    public static final String INFO = "[INFO]-";
+
+    public static final String ERROR = "[ERROR]-";
+
+    public static final String PERSIST = "[PERSIST]-";
+
+    public static void info(Logger logger, String message) {
+
+        logger.info(INFO + message);
+    }
+
+    public static void persist(Logger logger, String message) {
+
+        logger.info(PERSIST + message);
+    }
+
+    public static void error(Logger logger, String message, Exception e) {
+
+        logger.info(ERROR + message, e);
+    }
 
     public static <T> void infoLog(Class<T> clazz, Exception e, String info, Object... params) {
 
@@ -45,8 +66,9 @@ public class LogHelper {
             logger.error(info);
         }
     }
+
     public static <T> void errorLog(Logger logger, Throwable e, String info, Object... params) {
-        
+
         if (params != null && params.length > 0) {
             info = MessageFormat.format(info, params);
         }
@@ -89,7 +111,7 @@ public class LogHelper {
 
         return Logger.getLogger("info_logger");
     }
-    
+
     public static Logger getPersistLogger() {
 
         return Logger.getLogger("persist_logger");

@@ -321,6 +321,7 @@ public class W500Entity {
             return false;
         if (score != null ? !score.equals(that.score) : that.score != null) return false;
         if (halfScore != null ? !halfScore.equals(that.halfScore) : that.halfScore != null) return false;
+        if (half != null ? !half.equals(that.half) : that.half != null) return false;
         if (durationTime != null ? !durationTime.equals(that.durationTime) : that.durationTime != null) return false;
         if (matchTime != null ? !matchTime.equals(that.matchTime) : that.matchTime != null) return false;
         if (hadH != null ? !hadH.equals(that.hadH) : that.hadH != null) return false;
@@ -352,5 +353,30 @@ public class W500Entity {
         result = 31 * result + (hadA != null ? hadA.hashCode() : 0);
         result = 31 * result + (uniqueId != null ? uniqueId.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+
+        return "W500Entity{" +
+                "id=" + id +
+                ", homeTeam='" + homeTeam + '\'' +
+                ", awayTeam='" + awayTeam + '\'' +
+                ", matchCode=" + matchCode +
+                ", homeRedCard=" + homeRedCard +
+                ", homeYellowCard=" + homeYellowCard +
+                ", awayRedCard=" + awayRedCard +
+                ", awayYellowCard=" + awayYellowCard +
+                ", score='" + score + '\'' +
+                ", halfScore='" + halfScore + '\'' +
+                ", updateTime=" + updateTime +
+                ", durationTime='" + durationTime + '\'' +
+                ", matchTime=" + matchTime +
+                ", hadH=" + hadH +
+                ", hadD=" + hadD +
+                ", hadA=" + hadA +
+                ", half='" + half + '\'' +
+                ", uniqueId=" + uniqueId +
+                '}';
     }
 }
