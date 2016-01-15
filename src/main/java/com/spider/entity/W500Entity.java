@@ -82,6 +82,8 @@ public class W500Entity {
             return true;
         } else if (!w500Entity.getDurationTime().equals(this.durationTime)) {
             return true;
+        } else if (!w500Entity.getHalf().equals(this.half)) {
+            return true;
         } else {
             return false;
         }

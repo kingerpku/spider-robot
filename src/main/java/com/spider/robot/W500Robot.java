@@ -160,15 +160,18 @@ public class W500Robot implements Runnable {
             if (StringUtils.isNotBlank(durationTime)) {
                 if (durationTime.contains("未")) {
                     w500Entity.setHalf("未");
+                    w500Entity.setDurationTime("0");
                 } else if (durationTime.contains("完")) {
                     w500Entity.setHalf("完");
+                    w500Entity.setDurationTime("0");
                 } else if (durationTime.contains("中")) {
                     w500Entity.setHalf("中");
+                    w500Entity.setDurationTime("45");
                 } else {
                     w500Entity.setHalf(durationTime);
+                    w500Entity.setDurationTime("0");
                 }
             }
-            w500Entity.setDurationTime("0");
         }
     }
 

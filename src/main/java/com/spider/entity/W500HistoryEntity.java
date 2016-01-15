@@ -311,6 +311,7 @@ public class W500HistoryEntity {
         if (hadH != null ? !hadH.equals(that.hadH) : that.hadH != null) return false;
         if (hadD != null ? !hadD.equals(that.hadD) : that.hadD != null) return false;
         if (hadA != null ? !hadA.equals(that.hadA) : that.hadA != null) return false;
+        if (half != null ? !half.equals(that.half) : that.half != null) return false;
         if (uniqueId != null ? !uniqueId.equals(that.uniqueId) : that.uniqueId != null) return false;
 
         return true;
