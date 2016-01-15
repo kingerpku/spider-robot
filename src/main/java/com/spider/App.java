@@ -1,9 +1,12 @@
 package com.spider;
 
 import com.spider.config.AppConfig;
+import com.spider.config.StartConfigArg;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.Arrays;
 
 /**
  * 主程序入口，初始化spring容器，加载com.spider.robot.Starter后会启动抓取任务
@@ -17,8 +20,14 @@ public class App {
 
     public static void main(String[] args) {
 
-        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-        logger.info("app start success");
-        logger.info(applicationContext.toString());
+
+        if (StartConfigArg.check(args)) {
+            StartConfigArg.setArgs(Arrays.asList(args));
+            ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+            System.out.println("app start success");
+            System.out.println(applicationContext.toString());
+        } else {
+            System.out.println("start failed");
+        }
     }
 }

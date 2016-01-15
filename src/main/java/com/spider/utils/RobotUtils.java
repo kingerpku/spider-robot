@@ -21,7 +21,7 @@ import java.util.Date;
 public class RobotUtils {
 
     /**
-     * »ñÈ¡Î¨Ò»id£¬yyyyMMdd+matchCode
+     * è·å–å”¯ä¸€idï¼ŒyyyyMMdd+matchCode
      *
      * @param startDateTime
      * @param matchCode
@@ -33,7 +33,7 @@ public class RobotUtils {
     }
 
     /**
-     * ¸ù¾İ´ÅÅÌhtmlÎÄ¼şÉú³ÉHtmlPage¶ÔÏó£¬ÓÃÓÚ½âÎö
+     * æ ¹æ®ç£ç›˜htmlæ–‡ä»¶ç”ŸæˆHtmlPageå¯¹è±¡ï¼Œç”¨äºè§£æ
      *
      * @param file
      * @param charset

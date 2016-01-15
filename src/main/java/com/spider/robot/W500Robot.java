@@ -90,7 +90,7 @@ public class W500Robot implements Runnable {
                     Date end = new Date();
                     heartBeatService.heartBeat(ServiceName.W500.getName(), start, end, false, e.getMessage());
                 } finally {
-                    //            webClient.closeAllWindows();
+                    //            webClient.close();
                 }
             }
         } catch (InterruptedException e) {
