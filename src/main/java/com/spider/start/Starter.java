@@ -1,7 +1,7 @@
-package com.spider.robot;
+package com.spider.start;
 
 import com.spider.config.StartConfigArg;
-import org.apache.log4j.Logger;
+import com.spider.robot.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class Starter {
 
     public static final int INITIAL_DELAY = 5;
 
-    private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(8);
+    private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(10);
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -107,11 +107,11 @@ public class Starter {
             System.out.println("statistic robot start...");
         }
         if (args.contains("sportteryAll")) {
-            scheduleExecutor.scheduleWithFixedDelay(sportteryAllRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.MINUTES);
+            scheduleExecutor.scheduleWithFixedDelay(sportteryAllRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
             System.out.println("sportteryAll robot start...");
         }
         if (args.contains("sporttery")) {
-            scheduleExecutor.scheduleWithFixedDelay(sportteryRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.MINUTES);
+            scheduleExecutor.scheduleWithFixedDelay(sportteryRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
             System.out.println("sporttery robot start...");
         }
     }

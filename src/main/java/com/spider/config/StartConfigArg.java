@@ -6,6 +6,8 @@ import java.util.List;
 
 /**
  * Created by wsy on 2016/1/15.
+ *
+ * @author wsy
  */
 public class StartConfigArg {
 

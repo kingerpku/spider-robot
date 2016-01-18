@@ -40,7 +40,7 @@ public class W500DaoImpl implements W500Dao {
                 w500Entity.setId(query.getId());
             }
             if (w500Entity.getDurationTime().equals("0")) {
-                if(!w500Entity.getHalf().equals("完")) {
+                if(!w500Entity.getHalf().equals("完")&&!w500Entity.getHalf().equals("未")) {
                     w500Entity.setDurationTime(query.getDurationTime());
                     w500Entity.setHalf(query.getHalf());
                 }
