@@ -30,7 +30,7 @@ public class CompanyOddsDaoImpl implements CompanyOddsDao {
     private CompanyOddsRepository companyOddsRepository;
 
     @Override
-    public void saveOrUpdate(List<CompanyOddsEntity> list, Integer oddsType) {
+    public Long saveOrUpdate(List<CompanyOddsEntity> list, Integer oddsType) {
 
         if (list.size() != 0) {
             CompanyOddsEntity companyOddsEntity = list.get(0);
@@ -39,28 +39,33 @@ public class CompanyOddsDaoImpl implements CompanyOddsDao {
                     CompanyOddsEntity query = companyOddsRepository.findByEuropeIdAndOddsTypeAndGamingCompany(
                             companyOddsEntity.getEuropeId(), oddsType, companyOddsEntity.getGamingCompany());
                     if (query == null) {
-                        companyOddsRepository.save(companyOddsEntity);
+                        Long id = companyOddsRepository.save(companyOddsEntity).getId();
                         LogHelper.persist(logger, "save companyOddsEntity, " + companyOddsEntity);
                         CompanyOddsHistoryEntity companyOddsHistoryEntity = new CompanyOddsHistoryEntity(companyOddsEntity);
                         companyOddsHistoryRepository.save(companyOddsHistoryEntity);
                         LogHelper.persist(logger, "save companyOddsHistoryEntity, " + companyOddsHistoryEntity);
+                        return oddsType == 0 ? null : id;
                     } else {
                         if (!query.equals(companyOddsEntity)) {
-                            companyOddsEntity.setId(query.getId());
+                            long id = query.getId();
+                            companyOddsEntity.setId(id);
                             companyOddsRepository.save(companyOddsEntity);
                             LogHelper.persist(logger, "update companyOddsEntity, " + companyOddsEntity);
                             CompanyOddsHistoryEntity companyOddsHistoryEntity = new CompanyOddsHistoryEntity(query);
                             companyOddsHistoryRepository.save(companyOddsHistoryEntity);
                             LogHelper.persist(logger, "save companyOddsHistoryEntity, " + companyOddsHistoryEntity);
+                            return oddsType == 0 ? null : id;
                         }
                     }
                 }
             } catch (Exception e) {
                 LogHelper.error(logger, "Exception", e);
+                return null;
             }
         } else {
             LogHelper.persist(logger, "same as odds in database");
-            return;
+            return null;
         }
+        return null;
     }
 }

@@ -41,6 +41,8 @@ public interface SbcUpdateManager {
      */
     void updateSbcHdcOdds(HdcOdds hdcOdds, String matchCode, String companyName);
 
+    void updateOdds(Long id);
+
     /**
      * 向队列发送matchCode，用于通知matlab_service进行计算
      *

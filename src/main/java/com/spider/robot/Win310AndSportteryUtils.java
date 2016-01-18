@@ -66,6 +66,26 @@ public class Win310AndSportteryUtils {
         return "";
     }
 
+    public static String get500MatchCode(String originNum) {
+
+        if (originNum.contains("周一")) {
+            return originNum.replaceAll("周一", "1");
+        } else if (originNum.contains("周二")) {
+            return originNum.replaceAll("周二", "2");
+        } else if (originNum.contains("周三")) {
+            return originNum.replaceAll("周三", "3");
+        } else if (originNum.contains("周四")) {
+            return originNum.replaceAll("周四", "4");
+        } else if (originNum.contains("周五")) {
+            return originNum.replaceAll("周五", "5");
+        } else if (originNum.contains("周六")) {
+            return originNum.replaceAll("周六", "6");
+        } else if (originNum.contains("周日")) {
+            return originNum.replaceAll("周日", "7");
+        }
+        return "";
+    }
+
     public static String transSportteryMatchCode(String competitionNum) {
 
         String flag = competitionNum.substring(0, 2);

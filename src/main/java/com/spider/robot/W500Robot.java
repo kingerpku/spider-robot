@@ -90,7 +90,9 @@ public class W500Robot implements Runnable {
             W500Entity w500Entity = new W500Entity();
             try {
                 String matchCode = tr.getAttribute("order");
+//                String matchCode = ((DomText) tr.getByXPath("td[1]/text()").get(0)).getWholeText();
                 logger.info(INFO + "start parse W500Entity, match code is " + matchCode);
+//                w500Entity.setMatchCode(Integer.valueOf(Win310AndSportteryUtils.get500MatchCode(matchCode)));
                 w500Entity.setMatchCode(Integer.valueOf(matchCode));
                 setTeams(tr, w500Entity);
                 setDurationTime(tr, w500Entity);

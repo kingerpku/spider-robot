@@ -12,6 +12,7 @@ import com.spider.fetcher.impl.HttpClientFetcherImpl;
 import com.spider.global.Constants;
 import com.spider.global.ServiceName;
 import com.spider.repository.TCrawlerWin310Repository;
+import com.spider.sbc.SbcUpdateManager;
 import com.spider.service.HeartBeatService;
 import com.spider.utils.LogHelper;
 import com.spider.utils.RobotUtils;
@@ -56,6 +57,9 @@ public class CompanyOddsRobot implements Runnable {
 
     @Autowired
     private CompanyOddsDao companyOddsDao;
+
+    @Autowired
+    private SbcUpdateManager sbcUpdateManager;
 
     private BlockingQueue<CompanyOddsParam> blockingQueue = new LinkedBlockingQueue<>();
 
@@ -157,7 +161,10 @@ public class CompanyOddsRobot implements Runnable {
                     Map<Integer, List<CompanyOddsEntity>> map = parseOdds(companyName, companyOddsParam.getEuropeId(), companyOddsParam.getHtmlPage());
                     for (Integer key : map.keySet()) {
                         List<CompanyOddsEntity> oddsList = map.get(key);
-                        companyOddsDao.saveOrUpdate(oddsList, key);
+                        Long id = companyOddsDao.saveOrUpdate(oddsList, key);
+                        if (id != null) {
+                            sbcUpdateManager.updateOdds(id);
+                        }
                     }
                 }
             } catch (InterruptedException e) {

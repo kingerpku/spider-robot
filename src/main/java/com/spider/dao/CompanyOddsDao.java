@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface CompanyOddsDao {
 
-    void saveOrUpdate(List<CompanyOddsEntity> list, Integer oddsType);
+    Long saveOrUpdate(List<CompanyOddsEntity> list, Integer oddsType);
 }
