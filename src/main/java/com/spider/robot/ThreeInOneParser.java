@@ -95,7 +95,7 @@ public class ThreeInOneParser implements Runnable {
     @Autowired
     private HeartBeatService heartBeatService;
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(20);
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     public ThreeInOneParser() {
 
@@ -110,7 +110,6 @@ public class ThreeInOneParser implements Runnable {
     public void run() {
 
         Date start = new Date();
-        List<TCrawlerWin310> onSaleMatches = win310Repository.findOnSaleMatches();
         String serviceName = null;
         if (JINBAOBO_NAME.equals(companyName)) {
             serviceName = ServiceName.JinBaoBoRobot.getName();
@@ -118,6 +117,7 @@ public class ThreeInOneParser implements Runnable {
             serviceName = ServiceName.LiJiRobot.getName();
         }
         try {
+            List<TCrawlerWin310> onSaleMatches = win310Repository.findOnSaleMatches();
             CountDownLatch countDownLatch = new CountDownLatch(onSaleMatches.size());
             for (TCrawlerWin310 win310 : onSaleMatches) {
                 executorService.submit(new Runner(win310, countDownLatch));
@@ -127,8 +127,10 @@ public class ThreeInOneParser implements Runnable {
             heartBeatService.heartBeat(serviceName, start, end, true, null);
         } catch (Exception e) {
             Date end = new Date();
+            LogHelper.error(logger, "Exception", e);
             heartBeatService.heartBeat(serviceName, start, end, false, e.getMessage());
         }
+        LogHelper.info(logger, "CURRENT MEMORY " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + "M");
     }
 
     class Runner implements Runnable {
@@ -166,7 +168,7 @@ public class ThreeInOneParser implements Runnable {
                 Integer europeId = Integer.valueOf(win310.getWin310EuropeId());
                 List<HtmlTable> tables = (List<HtmlTable>) htmlPage.getByXPath("//table[@class='gts']");
                 if (tables.size() == 0) {
-                    LogHelper.info(logger, "url, NO TABLE FOUND");
+                    LogHelper.info(logger, "url" + url + ", NO TABLE FOUND");
                     return;
                 }
                 try {
@@ -206,6 +208,7 @@ public class ThreeInOneParser implements Runnable {
             webClient.closeAllWindows();
             countDownLatch.countDown();
             LogHelper.info(logger, GamingCompany.abbr(companyName) + " CountDownLatch is " + countDownLatch.getCount() + ", matchCode[" + win310.getCompetitionNum() + "]");
+
         }
     }
 

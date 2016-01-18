@@ -77,6 +77,24 @@ public class SbcUpdateManagerImpl implements SbcUpdateManager {
     }
 
     @Override
+    public void updateOdds(Long id) {
+
+        HttpClient httpClient = HttpClientBuilder.create().build();
+
+        for (int i = 0; i < Constants.SPIDER_WEB_HOST_PORTS.length; i++) {
+            String uri = Constants.SPIDER_WEB_HOST_PORTS[i] + "/spider-web/syncOdds.do?id=" + id;
+            HttpGet get = new HttpGet(uri);
+            try {
+                httpClient.execute(get);
+                infoLogger.info("send to get request uri[" + uri + "]");
+            } catch (Throwable e) {
+                // 都在一个机器上，几乎不会出错，不做特殊的错误处理
+                infoLogger.error("send to get request uri[" + uri + "]", e);
+            }
+        }
+    }
+
+    @Override
     public void updateMatchCode(String matchCode) {
 
         //rtodo 暂时写死
@@ -123,7 +141,7 @@ public class SbcUpdateManagerImpl implements SbcUpdateManager {
             try {
                 httpClient.execute(get);
                 infoLogger.info("send to get request uri[" + uri + "]");
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 // 都在一个机器上，几乎不会出错，不做特殊的错误处理
                 infoLogger.error("send to get request uri[" + uri + "]", e);
             }
