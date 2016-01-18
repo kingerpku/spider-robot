@@ -10,6 +10,7 @@ import com.spider.entity.W500Entity;
 import com.spider.global.ServiceName;
 import com.spider.service.HeartBeatService;
 import com.spider.utils.DateUtils;
+import com.spider.utils.LogHelper;
 import com.spider.utils.RobotUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,15 +41,6 @@ public class W500Robot implements Runnable {
 
     private static Logger logger = Logger.getLogger("500_logger");
 
-    private WebClient webClient;
-
-    {
-        webClient = new WebClient();
-        webClient.getOptions().setJavaScriptEnabled(true);
-        webClient.getOptions().setThrowExceptionOnScriptError(false);
-        webClient.getOptions().setCssEnabled(false);
-    }
-
     private BlockingQueue<HtmlPage> htmlPageBlockingQueue = new LinkedBlockingDeque<>();
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -68,19 +60,12 @@ public class W500Robot implements Runnable {
     public void run() {
 
         executorService.submit(new FileDealer());
-        logger.info(INFO + "start FileDealer...");
         Date start = new Date();
         HtmlPage page1;
         try {
             while ((page1 = htmlPageBlockingQueue.take()) != null) {
                 try {
-                    //            HtmlPage page1 = webClient.getPage(getUrl(new Date()));
-                    //            webClient.setJavaScriptTimeout(5000);
                     List<W500Entity> w500Entities1 = parse(page1);
-                    //            HtmlPage page2 = webClient.getPage(getUrl(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))));
-                    //            webClient.setJavaScriptTimeout(5000);
-                    //            List<W500Entity> w500Entities2 = parse(page2);
-                    //            w500Entities1.addAll(w500Entities2);
                     for (W500Entity w500Entity : w500Entities1) {
                         w500Dao.saveOrUpdate(w500Entity);
                     }
@@ -89,8 +74,6 @@ public class W500Robot implements Runnable {
                 } catch (Exception e) {
                     Date end = new Date();
                     heartBeatService.heartBeat(ServiceName.W500.getName(), start, end, false, e.getMessage());
-                } finally {
-                    //            webClient.close();
                 }
             }
         } catch (InterruptedException e) {
@@ -177,15 +160,18 @@ public class W500Robot implements Runnable {
             if (StringUtils.isNotBlank(durationTime)) {
                 if (durationTime.contains("未")) {
                     w500Entity.setHalf("未");
+                    w500Entity.setDurationTime("0");
                 } else if (durationTime.contains("完")) {
                     w500Entity.setHalf("完");
+                    w500Entity.setDurationTime("0");
                 } else if (durationTime.contains("中")) {
                     w500Entity.setHalf("中");
+                    w500Entity.setDurationTime("45");
                 } else {
                     w500Entity.setHalf(durationTime);
+                    w500Entity.setDurationTime("0");
                 }
             }
-            w500Entity.setDurationTime("0");
         }
     }
 
@@ -252,27 +238,34 @@ public class W500Robot implements Runnable {
         @Override
         public void run() {
 
-            while (true) {
-                Collection<File> files = FileUtils.listFiles(new File("e:\\500"), new String[]{"html"}, false);
-                if (files.size() < 1) {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+            logger.info(INFO + "start FileDealer...");
+            try {
+                while (true) {
+                    LogHelper.info(logger, "list file in " + pathW500);
+                    Collection<File> files = FileUtils.listFiles(new File(pathW500), new String[]{"html"}, false);
+                    LogHelper.info(logger, "list files, " + files);
+                    if (files.size() < 1) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            LogHelper.error(logger, "sleep was interrupted", e);
+                        }
+                    }
+                    for (File file : files) {
+                        try {
+                            HtmlPage htmlPage = RobotUtils.getHtmlPageFromFile(file, "gbk");
+                            htmlPageBlockingQueue.put(htmlPage);
+                            logger.info(INFO + "put HtmlPage to queue, filename is " + file.getName());
+                            file.delete();
+                        } catch (InterruptedException e) {
+                            logger.info(ERROR + "InterruptedException, filename is " + file.getName(), e);
+                        } catch (IOException e) {
+                            logger.info(INFO + "IOException, filename is " + file.getName(), e);
+                        }
                     }
                 }
-                for (File file : files) {
-                    try {
-                        HtmlPage htmlPage = RobotUtils.getHtmlPageFromFile(file, "gbk");
-                        htmlPageBlockingQueue.put(htmlPage);
-                        logger.info(INFO + "put HtmlPage to queue, filename is " + file.getName());
-                        file.delete();
-                    } catch (InterruptedException e) {
-                        logger.info(ERROR + "InterruptedException, filename is " + file.getName(), e);
-                    } catch (IOException e) {
-                        logger.info(INFO + "IOException, filename is " + file.getName(), e);
-                    }
-                }
+            } catch (Exception e) {
+                LogHelper.error(logger, "FileDealer", e);
             }
         }
     }

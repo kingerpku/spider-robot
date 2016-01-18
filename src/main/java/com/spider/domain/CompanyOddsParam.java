@@ -42,4 +42,14 @@ public class CompanyOddsParam {
 
         this.europeId = europeId;
     }
+
+    @Override
+    public String toString() {
+
+        return "CompanyOddsParam{" +
+                "htmlPage=" + htmlPage +
+                ", companyName='" + companyName + '\'' +
+                ", europeId=" + europeId +
+                '}';
+    }
 }

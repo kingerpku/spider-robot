@@ -1,10 +1,8 @@
 package com.spider.robot;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.google.common.collect.Lists;
 import com.spider.domain.GamingCompany;
 import com.spider.entity.CompanyOddsEntity;
@@ -16,16 +14,13 @@ import com.spider.fetcher.FetcherContent;
 import com.spider.fetcher.HttpConfig;
 import com.spider.selector.Selector;
 import com.spider.selector.XpathSelector;
-import com.spider.utils.Calendars;
 import com.spider.utils.LotteryUtils;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 

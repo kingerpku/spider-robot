@@ -39,6 +39,12 @@ public class W500DaoImpl implements W500Dao {
                 tmp = new W500Entity(query);
                 w500Entity.setId(query.getId());
             }
+            if (w500Entity.getDurationTime().equals("0")) {
+                if(!w500Entity.getHalf().equals("完")&&!w500Entity.getHalf().equals("未")) {
+                    w500Entity.setDurationTime(query.getDurationTime());
+                    w500Entity.setHalf(query.getHalf());
+                }
+            }
             w500Repository.save(w500Entity);
             logger.info("[PERSIST]-" + "save w500Entity, " + w500Entity);
             W500HistoryEntity w500HistoryEntity = new W500HistoryEntity(w500Entity);

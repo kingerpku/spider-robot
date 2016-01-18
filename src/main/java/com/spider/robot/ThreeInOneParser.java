@@ -15,6 +15,7 @@ import com.spider.global.ServiceName;
 import com.spider.repository.*;
 import com.spider.sbc.SbcUpdateManager;
 import com.spider.service.HeartBeatService;
+import com.spider.utils.LogHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -49,9 +50,7 @@ public class ThreeInOneParser implements Runnable {
 
     private HttpConfig httpConfig = new HttpConfig();
 
-    private Fetcher fetcher = new HttpClientFetcherImpl();
-
-    private Logger logger = Logger.getLogger("info_logger");
+    private Logger logger = Logger.getLogger("3in1_logger");
 
     //    private final String jinbaoboPageUrlTemplate = "http://data.310win.com/changedetail/3in1Odds.aspx?id={0}&companyid=" + GamingCompany.JinBaoBo.getId() + "&l=0";
 
@@ -112,7 +111,6 @@ public class ThreeInOneParser implements Runnable {
 
         Date start = new Date();
         List<TCrawlerWin310> onSaleMatches = win310Repository.findOnSaleMatches();
-//        List<TCrawlerWin310> onSaleMatches = win310Repository.findAll();
         String serviceName = null;
         if (JINBAOBO_NAME.equals(companyName)) {
             serviceName = ServiceName.JinBaoBoRobot.getName();
@@ -157,17 +155,18 @@ public class ThreeInOneParser implements Runnable {
         String url = formatUrl(win310);
         WebClient webClient = new WebClient();
         try {
-            logger.info("url [" + url + "] start....");
+            LogHelper.info(logger, "url [" + url + "] start....");
             String html = Win310AndSportteryUtils.getOddsHtml(url, new HttpClientFetcherImpl(), httpConfig, null);
             webClient.getOptions().setCssEnabled(false);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
-            webClient.getOptions().setJavaScriptEnabled(true);
+            webClient.getOptions().setJavaScriptEnabled(false);
             HtmlPage htmlPage = webClient.getPage(url);
             synchronized (this) {
                 Long id = win310.getId();
                 Integer europeId = Integer.valueOf(win310.getWin310EuropeId());
                 List<HtmlTable> tables = (List<HtmlTable>) htmlPage.getByXPath("//table[@class='gts']");
                 if (tables.size() == 0) {
+                    LogHelper.info(logger, "url, NO TABLE FOUND");
                     return;
                 }
                 try {
@@ -175,7 +174,7 @@ public class ThreeInOneParser implements Runnable {
                     List<HadOdds> queryHadList = hadOddsRepository.findByWin310IdAndGamingCompany(id, companyName);
                     gamingCompanyHadDao.saveOrUpdateHadOdds(queryHadList, hadOddsList, id);
                 } catch (Exception e) {
-                    logger.error("parse nowgoal had odds error", e);
+                    LogHelper.error(logger, "parse nowgoal had odds error", e);
                 }
                 String matchCode = win310.getCompetitionNum();
                 try {
@@ -187,7 +186,7 @@ public class ThreeInOneParser implements Runnable {
                         sbcUpdateManager.updateMatchCode(matchCode);
                     }
                 } catch (Exception e) {
-                    logger.error("parse nowgoal hilo odds error", e);
+                    LogHelper.error(logger, "parse nowgoal hilo odds error", e);
                 }
                 try {
                     List<HdcOddsHistory> hdcOddsList = Win310AndSportteryUtils.parseHdcOdds(html, companyName, europeId);
@@ -198,15 +197,15 @@ public class ThreeInOneParser implements Runnable {
                         sbcUpdateManager.updateMatchCode(matchCode);
                     }
                 } catch (Exception e) {
-                    logger.error("parse nowgoal hdc odds error", e);
+                    LogHelper.error(logger, "parse nowgoal hdc odds error", e);
                 }
             }
         } catch (Exception e) {
-            logger.info("catch " + companyName + " url " + url + " error", e);
+            LogHelper.error(logger, "catch " + companyName + " url " + url + " error", e);
         } finally {
             webClient.closeAllWindows();
             countDownLatch.countDown();
-            logger.info(companyName + " CountDownLatch is " + countDownLatch.getCount() + ", matchCode[" + win310.getCompetitionNum() + "]");
+            LogHelper.info(logger, GamingCompany.abbr(companyName) + " CountDownLatch is " + countDownLatch.getCount() + ", matchCode[" + win310.getCompetitionNum() + "]");
         }
     }
 

@@ -1,5 +1,7 @@
 package com.spider.robot;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.spider.dao.SportteryDao;
 import com.spider.entity.TCrawlerSporttery;
@@ -7,9 +9,8 @@ import com.spider.global.Constants;
 import com.spider.global.ServiceName;
 import com.spider.service.HeartBeatService;
 import com.spider.utils.MyTypeConvert;
-import net.sf.json.JSONObject;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,14 +23,10 @@ import com.spider.utils.DateUtils;
 import com.spider.utils.LogHelper;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 该类负责用于抓取官网had,hhad玩法的当日比赛赔率信息
@@ -54,8 +51,6 @@ public class SportteryRobot implements Runnable {
     private static Logger infoLogger = LogHelper.getInfoLogger();
 
     private HttpConfig httpConfig = new HttpConfig();
-
-    private ScheduledExecutorService scheduleExecutor = Executors.newSingleThreadScheduledExecutor();
 
     @Autowired
     private HeartBeatService heartBeatService;
@@ -112,7 +107,7 @@ public class SportteryRobot implements Runnable {
         if (StringUtils.isEmpty(jsonArray)) {
             return;
         }
-        JSONObject myJsonObject = JSONObject.fromObject(jsonArray);
+        JSONObject myJsonObject = JSON.parseObject(jsonArray);
         JSONObject statusJsonObject = myJsonObject.getJSONObject("status");
         if (statusJsonObject != null) {
             lastUpdated = statusJsonObject.getString("last_updated");

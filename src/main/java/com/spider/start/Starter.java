@@ -1,7 +1,7 @@
-package com.spider.robot;
+package com.spider.start;
 
 import com.spider.config.StartConfigArg;
-import org.apache.log4j.Logger;
+import com.spider.robot.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -28,9 +28,7 @@ public class Starter {
 
     public static final int INITIAL_DELAY = 5;
 
-    private Logger appLogger = Logger.getLogger("app_logger");
-
-    private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(8);
+    private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(10);
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -81,11 +79,11 @@ public class Starter {
             System.out.println("win310 robot start...");
         }
         if (args.contains("jbb3")) {
-            scheduleExecutor.scheduleWithFixedDelay(jbbParser, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(jbbParser, 0, 60, TimeUnit.SECONDS);
             System.out.println("jbb robot start...");
         }
         if (args.contains("lj3")) {
-            scheduleExecutor.scheduleWithFixedDelay(ljParser, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(ljParser, 30, 60, TimeUnit.SECONDS);
             System.out.println("lj robot start...");
         }
         if (args.contains("pinnacle")) {
@@ -97,11 +95,11 @@ public class Starter {
             System.out.println("w500 robot start...");
         }
         if (args.contains("jbb")) {
-            scheduleExecutor.scheduleWithFixedDelay(jbbRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(jbbRobot, 0, 100, TimeUnit.SECONDS);
             System.out.println("jbb robot start...");
         }
         if (args.contains("lj")) {
-            scheduleExecutor.scheduleWithFixedDelay(ljRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(ljRobot, 30, 100, TimeUnit.SECONDS);
             System.out.println("lj robot start...");
         }
         if (args.contains("statistic")) {
@@ -109,11 +107,11 @@ public class Starter {
             System.out.println("statistic robot start...");
         }
         if (args.contains("sportteryAll")) {
-            scheduleExecutor.scheduleWithFixedDelay(sportteryAllRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.MINUTES);
+            scheduleExecutor.scheduleWithFixedDelay(sportteryAllRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
             System.out.println("sportteryAll robot start...");
         }
         if (args.contains("sporttery")) {
-            scheduleExecutor.scheduleWithFixedDelay(sportteryRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.MINUTES);
+            scheduleExecutor.scheduleWithFixedDelay(sportteryRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
             System.out.println("sporttery robot start...");
         }
     }
