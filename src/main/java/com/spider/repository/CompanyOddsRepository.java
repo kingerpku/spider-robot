@@ -11,4 +11,6 @@ import java.util.List;
 public interface CompanyOddsRepository extends JpaRepository<CompanyOddsEntity, Long> {
 
     CompanyOddsEntity findByEuropeIdAndOddsTypeAndGamingCompany(Integer europeId, Integer oddsType, String gamingCompany);
+
+    List<CompanyOddsEntity> findByEuropeId(Integer europeId);
 }

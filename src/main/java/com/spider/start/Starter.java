@@ -79,11 +79,11 @@ public class Starter {
             System.out.println("win310 robot start...");
         }
         if (args.contains("jbb3")) {
-            scheduleExecutor.scheduleWithFixedDelay(jbbParser, 0, 60, TimeUnit.SECONDS);
+//            scheduleExecutor.scheduleWithFixedDelay(jbbParser, 0, 60, TimeUnit.SECONDS);
             System.out.println("jbb robot start...");
         }
         if (args.contains("lj3")) {
-            scheduleExecutor.scheduleWithFixedDelay(ljParser, 30, 60, TimeUnit.SECONDS);
+//            scheduleExecutor.scheduleWithFixedDelay(ljParser, 30, 60, TimeUnit.SECONDS);
             System.out.println("lj robot start...");
         }
         if (args.contains("pinnacle")) {
@@ -91,7 +91,7 @@ public class Starter {
             System.out.println("pinnacle robot start...");
         }
         if (args.contains("500")) {
-            executorService.submit(w500Robot);
+            scheduleExecutor.scheduleWithFixedDelay(w500Robot, INITIAL_DELAY, 10, TimeUnit.SECONDS);
             System.out.println("w500 robot start...");
         }
         if (args.contains("jbb")) {

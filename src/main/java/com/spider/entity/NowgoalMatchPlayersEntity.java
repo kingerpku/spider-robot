@@ -59,7 +59,7 @@ public class NowgoalMatchPlayersEntity {
     }
 
     @Basic
-    @Column(name = "isFirst")
+    @Column(name = "is_first")
     public Boolean getIsFirst() {
 
         return isFirst;

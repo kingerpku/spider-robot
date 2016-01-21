@@ -2,6 +2,7 @@ package com.spider.dao;
 
 
 import com.spider.entity.CompanyOddsEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -10,5 +11,6 @@ import java.util.List;
  */
 public interface CompanyOddsDao {
 
-    Long saveOrUpdate(List<CompanyOddsEntity> list, Integer oddsType);
+    @Transactional
+    Long saveOrUpdate(List<CompanyOddsEntity> list, Integer oddsType, Integer europeId);
 }

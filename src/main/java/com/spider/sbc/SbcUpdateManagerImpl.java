@@ -133,18 +133,19 @@ public class SbcUpdateManagerImpl implements SbcUpdateManager {
 
     public void run(String matchCode, int type) {
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        String uri = null;
+        try {
+            HttpClient httpClient = HttpClientBuilder.create().build();
 
-        for (int i = 0; i < Constants.SPIDER_WEB_HOST_PORTS.length; i++) {
-            String uri = Constants.SPIDER_WEB_HOST_PORTS[i] + "/spider-web/sync.do?matchCode=" + matchCode + "&type=" + type;
-            HttpGet get = new HttpGet(uri);
-            try {
+            for (int i = 0; i < Constants.SPIDER_WEB_HOST_PORTS.length; i++) {
+                uri = Constants.SPIDER_WEB_HOST_PORTS[i] + "/spider-web/sync.do?matchCode=" + matchCode + "&type=" + type;
+                HttpGet get = new HttpGet(uri);
                 httpClient.execute(get);
                 infoLogger.info("send to get request uri[" + uri + "]");
-            } catch (Throwable e) {
-                // 都在一个机器上，几乎不会出错，不做特殊的错误处理
-                infoLogger.error("send to get request uri[" + uri + "]", e);
             }
+        } catch (Throwable e) {
+            // 都在一个机器上，几乎不会出错，不做特殊的错误处理
+            infoLogger.error("send to get request uri[" + uri + "]", e);
         }
     }
 }

@@ -87,6 +87,7 @@ public class CompanyOddsRobot implements Runnable {
 
         Date start = new Date();
         List<TCrawlerWin310> onSaleMatches = win310Repository.findOnSaleMatches();
+//        List<TCrawlerWin310> onSaleMatches = win310Repository.findAll();
         String serviceName = null;
         if (JINBAOBO_NAME.equals(companyName)) {
             serviceName = ServiceName.JinBaoBoRobot.getName();
@@ -142,9 +143,10 @@ public class CompanyOddsRobot implements Runnable {
                 LogHelper.error(logger, "IOException", e);
             } catch (InterruptedException e) {
                 LogHelper.error(logger, "InterruptedException", e);
+            } catch (Exception e) {
+                LogHelper.error(logger, "Exception", e);
             } finally {
                 countDownLatch.countDown();
-//                webClient.closeAllWindows();
             }
         }
     }
@@ -157,11 +159,12 @@ public class CompanyOddsRobot implements Runnable {
             CompanyOddsParam companyOddsParam;
             try {
                 while ((companyOddsParam = blockingQueue.take()) != null) {
-                    LogHelper.info(logger, "take CompanyOddsParam from blocking queue, europe id is " + companyOddsParam.getEuropeId());
-                    Map<Integer, List<CompanyOddsEntity>> map = parseOdds(companyName, companyOddsParam.getEuropeId(), companyOddsParam.getHtmlPage());
+                    Integer europeId = companyOddsParam.getEuropeId();
+                    LogHelper.info(logger, "take CompanyOddsParam from blocking queue, europe id is " + europeId);
+                    Map<Integer, List<CompanyOddsEntity>> map = parseOdds(companyName, europeId, companyOddsParam.getHtmlPage());
                     for (Integer key : map.keySet()) {
                         List<CompanyOddsEntity> oddsList = map.get(key);
-                        Long id = companyOddsDao.saveOrUpdate(oddsList, key);
+                        Long id = companyOddsDao.saveOrUpdate(oddsList, key, europeId);
                         if (id != null) {
                             sbcUpdateManager.updateOdds(id);
                         }
@@ -202,21 +205,7 @@ public class CompanyOddsRobot implements Runnable {
                     } else {
                         odds.setScore(score);
                     }
-                    List<?> redCards = tr.getByXPath("td[2]/font");
-                    if (redCards.size() == 1) {
-                        HtmlFont cardFont = (HtmlFont) redCards.get(0);
-                        if (cardFont.getNextSibling() == null) {
-                            odds.setHomeRedCard(Integer.valueOf(cardFont.asText()));
-                        } else {
-                            odds.setAwayRedCard(Integer.valueOf(cardFont.asText()));
-                        }
-                    } else if (redCards.size() == 2) {
-                        odds.setHomeRedCard(Integer.valueOf(((HtmlFont) redCards.get(0)).asText()));
-                        odds.setAwayRedCard(Integer.valueOf(((HtmlFont) redCards.get(1)).asText()));
-                    } else {
-                        odds.setHomeRedCard(0);
-                        odds.setAwayRedCard(0);
-                    }
+                    setRedCards(odds, tr);
                     String durationTime = "";
                     List<?> durationTimeList = tr.getByXPath("td[1]/text()");
                     if (durationTimeList.size() != 0) {
@@ -237,11 +226,35 @@ public class CompanyOddsRobot implements Runnable {
                     odds.setEuropeId(europeId);
                     odds.setOddsType(i);
                     LogHelper.info(logger, "parse company odds, " + odds);
-                    list.add(odds);
+                    if (odds.valid()) {
+                        list.add(odds);
+                        break;
+                    }
                 }
                 result.put(i, list);
             }
             return result;
+        }
+
+        private void setRedCards(CompanyOddsEntity odds, HtmlTableRow tr) {
+
+            List<?> redCards = tr.getByXPath("td[2]/font");
+            if (redCards.size() == 1) {
+                HtmlFont cardFont = (HtmlFont) redCards.get(0);
+                if (cardFont.getNextSibling() == null) {
+                    odds.setAwayRedCard(Integer.valueOf(cardFont.asText()));
+                    odds.setHomeRedCard(0);
+                } else {
+                    odds.setHomeRedCard(Integer.valueOf(cardFont.asText()));
+                    odds.setAwayRedCard(0);
+                }
+            } else if (redCards.size() == 2) {
+                odds.setHomeRedCard(Integer.valueOf(((HtmlFont) redCards.get(0)).asText()));
+                odds.setAwayRedCard(Integer.valueOf(((HtmlFont) redCards.get(1)).asText()));
+            } else {
+                odds.setHomeRedCard(0);
+                odds.setAwayRedCard(0);
+            }
         }
 
         private String getOdds(HtmlTableRow tr, String xpath) {

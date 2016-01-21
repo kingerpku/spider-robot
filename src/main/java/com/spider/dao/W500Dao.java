@@ -7,5 +7,5 @@ import com.spider.entity.W500Entity;
  */
 public interface W500Dao {
 
-    void saveOrUpdate(W500Entity w500Entity);
+    boolean saveOrUpdate(W500Entity w500Entity);
 }
