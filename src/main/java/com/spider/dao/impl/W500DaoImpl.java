@@ -30,7 +30,7 @@ public class W500DaoImpl implements W500Dao {
     private SbcUpdateManager sbcUpdateManager;
 
     @Override
-    public void saveOrUpdate(W500Entity w500Entity) {
+    public boolean saveOrUpdate(W500Entity w500Entity) {
 
         W500Entity query = w500Repository.findByMatchCode(w500Entity.getMatchCode());
         if (!w500Entity.equals(query)) {
@@ -38,11 +38,11 @@ public class W500DaoImpl implements W500Dao {
             if (query != null) {
                 tmp = new W500Entity(query);
                 w500Entity.setId(query.getId());
-            }
-            if (w500Entity.getDurationTime().equals("0")) {
-                if(!w500Entity.getHalf().equals("完")&&!w500Entity.getHalf().equals("未")) {
-                    w500Entity.setDurationTime(query.getDurationTime());
-                    w500Entity.setHalf(query.getHalf());
+                if (w500Entity.getDurationTime().equals("0")) {
+                    if (!w500Entity.getHalf().equals("完") && !w500Entity.getHalf().equals("未")) {
+                        w500Entity.setDurationTime(query.getDurationTime());
+                        w500Entity.setHalf(query.getHalf());
+                    }
                 }
             }
             w500Repository.save(w500Entity);
@@ -51,10 +51,11 @@ public class W500DaoImpl implements W500Dao {
             w500HistoryRepository.save(w500HistoryEntity);
             logger.info("[PERSIST]-" + "save w500HistoryEntity, " + w500HistoryEntity);
             if (w500Entity.needToSbc(tmp)) {
-                sbcUpdateManager.updateSbcScoreAndHalf(null, String.valueOf(w500Entity.getMatchCode()));
+                return true;
             }
         } else {
             logger.info("[PERSIST]-" + "same as w500Entity in database");
         }
+        return false;
     }
 }

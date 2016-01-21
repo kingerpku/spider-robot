@@ -254,7 +254,7 @@ public class CompanyOddsEntity {
 
     public boolean valid() {
 
-        return !oddsOne.equals("");
+        return !oddsOne.equals("") && !oddsTwo.contains("Closed");
     }
 
     @Override
@@ -276,5 +276,22 @@ public class CompanyOddsEntity {
                 ", oddsUpdateTime='" + oddsUpdateTime + '\'' +
                 ", updateTime=" + updateTime +
                 '}';
+    }
+
+    public void clear() {
+
+        this.europeId = null;
+        this.gamingCompany = "";
+        this.oddsOne = "";
+        this.oddsTwo = "";
+        this.oddsThree = "";
+        this.oddsType = null;
+        this.score = "";
+        this.durationTime = "";
+        this.homeRedCard = null;
+        this.awayRedCard = null;
+        this.state = "";
+        this.oddsUpdateTime = "";
+        this.updateTime = new Timestamp(System.currentTimeMillis());
     }
 }

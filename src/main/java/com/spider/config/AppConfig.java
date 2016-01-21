@@ -26,7 +26,6 @@ import java.nio.charset.Charset;
 @ComponentScan(basePackages = {"com.spider"})
 public class AppConfig {
 
-
     public static final String USER_PWD = "WF425817:fw19861210";
 
     @Bean

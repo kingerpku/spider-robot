@@ -7,7 +7,9 @@ package com.spider.domain;
  */
 public enum GamingCompany {
 
-    JinBaoBo("23", "金宝博"), LiJi("31", "利记"), Sporttery("0", "官网");
+    JinBaoBo("23", "金宝博"), //真正的金宝博是23，24是ibc，由于改变公司名称程序改动量较大，所以将此id改为24
+    LiJi("31", "利记"),
+    Sporttery("0", "官网");
 
     GamingCompany(String id, String name) {
 
