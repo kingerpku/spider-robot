@@ -30,16 +30,6 @@ public class Starter {
 
     private ScheduledExecutorService scheduleExecutor = Executors.newScheduledThreadPool(10);
 
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    @Autowired
-    @Qualifier("jbbParser")
-    private ThreeInOneParser jbbParser;
-
-    @Autowired
-    @Qualifier("ljParser")
-    private ThreeInOneParser ljParser;
-
     @Autowired
     private StatisticRobot statisticRobot;
 
@@ -77,14 +67,6 @@ public class Starter {
         if (args.contains("win310")) {
             scheduleExecutor.scheduleWithFixedDelay(win310Robot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
             System.out.println("win310 robot start...");
-        }
-        if (args.contains("jbb3")) {
-//            scheduleExecutor.scheduleWithFixedDelay(jbbParser, 0, 60, TimeUnit.SECONDS);
-            System.out.println("jbb robot start...");
-        }
-        if (args.contains("lj3")) {
-//            scheduleExecutor.scheduleWithFixedDelay(ljParser, 30, 60, TimeUnit.SECONDS);
-            System.out.println("lj robot start...");
         }
         if (args.contains("pinnacle")) {
             scheduleExecutor.scheduleWithFixedDelay(pinnaclesRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);

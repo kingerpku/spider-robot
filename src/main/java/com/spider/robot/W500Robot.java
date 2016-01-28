@@ -1,6 +1,5 @@
 package com.spider.robot;
 
-import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomText;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
@@ -21,12 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by wsy on 2016/1/7.
@@ -42,20 +38,17 @@ public class W500Robot implements Runnable {
 
     private static Logger logger = Logger.getLogger("500_logger");
 
-    private BlockingQueue<HtmlPage> htmlPageBlockingQueue = new LinkedBlockingDeque<>();
-
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     @Autowired
     private W500Dao w500Dao;
 
     @Autowired
     private HeartBeatService heartBeatService;
 
-    private String url = "http://live.500.com/?e=";
-
     @Value("${500.html.file.path}")
     private String pathW500;
+
+    @Value("${500.html.file.encoding}")
+    private String encoding;
 
     @Autowired
     private SbcUpdateManager sbcUpdateManager;
@@ -73,7 +66,7 @@ public class W500Robot implements Runnable {
             }
             for (File file : files) {
                 try {
-                    HtmlPage htmlPage = RobotUtils.getHtmlPageFromFile(file, "gbk");
+                    HtmlPage htmlPage = RobotUtils.getHtmlPageFromFile(file, encoding);
                     logger.info(INFO + "put HtmlPage to queue, filename is " + file.getName());
                     List<W500Entity> w500Entities = parse(htmlPage);
                     for (W500Entity w500Entity : w500Entities) {
@@ -154,7 +147,6 @@ public class W500Robot implements Runnable {
 
     private static void setDurationTime(HtmlTableRow tr, W500Entity w500Entity) {
 
-        String time = tr.getAttribute("time");
         List<DomText> durationTimeList = (List<DomText>) tr.getByXPath("td[5]/text()");
         String durationTime = "";
         if (durationTimeList.size() != 0) {
