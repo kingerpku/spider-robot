@@ -44,9 +44,9 @@ public class RobotUtils {
 
         WebClient client = new WebClient();
         try {
-            String content = FileUtils.readFileToString(file);
+            String content = FileUtils.readFileToString(file, charset);
             URL url = new URL("http://www.example.com");
-            StringWebResponse response = new StringWebResponse(content, charset, url);
+            StringWebResponse response = new StringWebResponse(content, "gbk", url);//1.6需要gbk
             client.getOptions().setJavaScriptEnabled(false);
             return HTMLParser.parseHtml(response, client.getCurrentWindow());
         } finally {

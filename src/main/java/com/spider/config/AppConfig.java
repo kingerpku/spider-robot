@@ -3,7 +3,6 @@ package com.spider.config;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.spider.global.Constants;
 import com.spider.robot.CompanyOddsRobot;
-import com.spider.robot.PinnaclesRobot;
 import com.spider.robot.ThreeInOneParser;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class HttpConfig {
 
-    public static final Map<String, String> DEFAULT_HEADERS = new HashMap<>();
+    private static final Map<String, String> DEFAULT_HEADERS = new HashMap<>();
 
     static {
         DEFAULT_HEADERS.put("Accept-Encoding", "gzip,deflate,sdch");
@@ -25,7 +25,7 @@ public class HttpConfig {
         }
     }
 
-    public static final Map<String, String> DEFAULT_COOKIES = new HashMap<>();
+    private static final Map<String, String> DEFAULT_COOKIES = new HashMap<>();
 
     public static final String DEFAULT_CHARSET = "UTF-8";
 
