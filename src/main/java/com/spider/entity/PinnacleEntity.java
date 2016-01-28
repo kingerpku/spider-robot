@@ -35,6 +35,32 @@ public class PinnacleEntity {
 
     private String awayTeam;
 
+    private Integer state = 0;
+
+    private Integer elapsed = 0;
+    @Basic
+    @Column(name = "state")
+    public Integer getState() {
+
+        return state;
+    }
+
+    public void setState(Integer state) {
+
+        this.state = state;
+    }
+    @Basic
+    @Column(name = "elapsed")
+    public Integer getElapsed() {
+
+        return elapsed;
+    }
+
+    public void setElapsed(Integer elapsed) {
+
+        this.elapsed = elapsed;
+    }
+
     public void setHomePrice(BigDecimal homePrice) {
 
         this.homePrice = homePrice;
@@ -151,8 +177,9 @@ public class PinnacleEntity {
         if (leagueId != null ? !leagueId.equals(that.leagueId) : that.leagueId != null) return false;
         if (eventId != null ? !eventId.equals(that.eventId) : that.eventId != null) return false;
         if (homeTeam != null ? !homeTeam.equals(that.homeTeam) : that.homeTeam != null) return false;
+        if (state != null ? !state.equals(that.state) : that.state != null) return false;
+        if (elapsed != null ? !elapsed.equals(that.elapsed) : that.elapsed != null) return false;
         return !(awayTeam != null ? !awayTeam.equals(that.awayTeam) : that.awayTeam != null);
-
     }
 
     @Override
@@ -236,6 +263,8 @@ public class PinnacleEntity {
                 ", eventId=" + eventId +
                 ", homeTeam='" + homeTeam + '\'' +
                 ", awayTeam='" + awayTeam + '\'' +
+                ", state=" + state +
+                ", elapsed=" + elapsed +
                 '}';
     }
 }

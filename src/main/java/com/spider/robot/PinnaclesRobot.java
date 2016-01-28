@@ -1,21 +1,27 @@
 package com.spider.robot;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.gargoylesoftware.htmlunit.UnexpectedPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import com.spider.dao.PinnaclesDao;
-import com.spider.domain.pinnacle.PinnacleLeague;
-import com.spider.domain.pinnacle.Sport;
+import com.spider.domain.pinnacle.InrunningEvents;
 import com.spider.entity.PinnacleEntity;
-import com.spider.repository.PinnacleRepository;
+import com.spider.utils.LogHelper;
 import com.spider.utils.XmlUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -36,30 +42,9 @@ public class PinnaclesRobot implements Runnable {
     @Autowired
     private PinnaclesDao pinnaclesDao;
 
+    private Logger logger = Logger.getLogger("pinnacle_logger");
+
     private long lastOddsUpdateTime;
-
-    public List<Sport> getSports() throws IOException {
-
-        List<Sport> sports = new ArrayList<>();
-        try {
-            XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/sports");
-            List<Node> sportNodes = null;
-            try {
-                sportNodes = XmlUtils.selectNodes(xmlPage.getContent(), "//sport");
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-            for (Node node : sportNodes) {
-                Sport sport = new Sport();
-                sport.setName(node.getText());
-                sport.setSportId(Integer.valueOf(node.valueOf("@id")));
-                sports.add(sport);
-            }
-        } finally {
-            webClient.closeAllWindows();
-        }
-        return sports;
-    }
 
     public List<PinnacleEntity> getPinnacles() throws IOException, DocumentException, ParseException {
 
@@ -82,6 +67,8 @@ public class PinnaclesRobot implements Runnable {
                     entities.add(event);
                 }
             }
+        } catch (Exception e) {
+            LogHelper.error(logger, "Exception", e);
         } finally {
             webClient.closeAllWindows();
         }
@@ -91,6 +78,9 @@ public class PinnaclesRobot implements Runnable {
     private PinnacleEntity parseEvent(Node eventNode, Integer leagueId, Date startDateTime) throws ParseException {
 
         PinnacleEntity pinnacleEntity = new PinnacleEntity();
+        Long id = Long.valueOf(eventNode.valueOf("id"));
+        pinnacleEntity.setEventId(id);
+        LogHelper.info(logger, "start parse pinnacle entity [" + id + "]");
         pinnacleEntity.setHomeTeam(eventNode.valueOf("homeTeam/name/text()"));
         pinnacleEntity.setHomePrice(new BigDecimal(eventNode.valueOf("periods/period/spreads/spread/homePrice/text()")));
         pinnacleEntity.setHomeSpread(Double.valueOf(eventNode.valueOf("periods/period/spreads/spread/homeSpread/text()")));
@@ -99,29 +89,51 @@ public class PinnaclesRobot implements Runnable {
         pinnacleEntity.setAwaySpread(Double.valueOf(eventNode.valueOf("periods/period/spreads/spread/awaySpread/text()")));
         pinnacleEntity.setCutOffDateTime(new Timestamp(DateUtils.parseDate(eventNode.valueOf("//periods/period/cutoffDateTime").replace('T', ' ').replaceAll("Z", ""), "yyyy-MM-dd HH:mm:ss").getTime()));
         pinnacleEntity.setStartDateTime(new Timestamp(startDateTime.getTime()));
-        pinnacleEntity.setEventId(Long.valueOf(eventNode.valueOf("id")));
         pinnacleEntity.setLeagueId(leagueId);
         pinnacleEntity.setIsLive(eventNode.valueOf("IsLive").equals("No") ? false : true);
         pinnacleEntity.setUpdateTime(new Timestamp(new Date().getTime()));
+        LogHelper.info(logger, "end parse pinnacle entity " + pinnacleEntity);
         return pinnacleEntity;
     }
 
-    public List<PinnacleLeague> getLeagues() throws IOException, DocumentException {
+    public List<InrunningEvents> getInrunnings() throws IOException, DocumentException {
 
-        List<PinnacleLeague> list = new ArrayList<>();
+        webClient = new WebClient();
+        webClient.getOptions().setJavaScriptEnabled(false);
+        webClient.getOptions().setCssEnabled(false);
+        webClient.addRequestHeader("Authorization", "Basic " + new BASE64Encoder().encode("WF425817:fw19861210".getBytes(Charset.forName("utf-8"))));
+
+        List<InrunningEvents> inrunningEvents = new ArrayList<>();
         try {
-            XmlPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/leagues?sportid=29");
-            List<Node> nodes = XmlUtils.selectNodes(xmlPage.getContent(), "//league");
-            for (Node node : nodes) {
-                PinnacleLeague league = new PinnacleLeague();
-                league.setLeagueId(Integer.valueOf(node.valueOf("@id")));
-                league.setName(node.getText());
-                list.add(league);
+            UnexpectedPage xmlPage = webClient.getPage("https://api.pinnaclesports.com/v1/inrunning");
+            JSONObject inrunning = JSON.parseObject(xmlPage.getWebResponse().getContentAsString());
+
+            JSONArray leagues = inrunning.getJSONArray("sports").getJSONObject(0).getJSONArray("leagues");
+            for (int i = 0; i < leagues.size(); i++) {
+                JSONArray events = leagues.getJSONObject(i).getJSONArray("events");
+                for (int j = 0; j < events.size(); j++) {
+                    InrunningEvents inrunningEvent = JSON.parseObject(events.getJSONObject(j).toJSONString(), InrunningEvents.class);
+                    inrunningEvents.add(inrunningEvent);
+                }
             }
+            /**
+             * Value	Description
+             1	        First half in progress
+             2	        Half time in progress
+             3	        Second half in progress
+             4	        End of regular time
+             5	        First half extra time in progress
+             6	        Extra time half time in progress
+             7	        Second half extra time in progress
+             8	        End of extra time
+             9	        End of Game
+             10	        Game is temporary suspended
+             11	        Penalties in progress
+             */
         } finally {
             webClient.closeAllWindows();
         }
-        return list;
+        return inrunningEvents;
     }
 
     @Override
@@ -130,15 +142,13 @@ public class PinnaclesRobot implements Runnable {
         List<PinnacleEntity> list = null;
         try {
             list = getPinnacles();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            LogHelper.error(logger, "Exception", e);
         }
         for (PinnacleEntity pinnacleEntity : list) {
             pinnaclesDao.saveOrUpdate(pinnacleEntity);
         }
     }
+
 }

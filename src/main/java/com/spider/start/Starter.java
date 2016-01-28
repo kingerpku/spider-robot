@@ -69,7 +69,7 @@ public class Starter {
             System.out.println("win310 robot start...");
         }
         if (args.contains("pinnacle")) {
-            scheduleExecutor.scheduleWithFixedDelay(pinnaclesRobot, INITIAL_DELAY, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
+            scheduleExecutor.scheduleWithFixedDelay(pinnaclesRobot, 0, DEFAULT_SCHEDULE_PERIOD, TimeUnit.SECONDS);
             System.out.println("pinnacle robot start...");
         }
         if (args.contains("500")) {

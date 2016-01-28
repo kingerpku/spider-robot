@@ -20,8 +20,8 @@ import java.nio.charset.Charset;
 @Import(value = {
         DataBaseConfig.class
 })
-//@PropertySource("file:/opt/spider/config.properties")
-@PropertySource("classpath:config.properties")
+@PropertySource("file:/opt/spider/config.properties")
+//@PropertySource("classpath:config.properties")
 @ComponentScan(basePackages = {"com.spider"})
 public class AppConfig {
 

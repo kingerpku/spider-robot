@@ -30,6 +30,7 @@ public class ToggleConfig {
         }
         FileUtils.writeStringToFile(configProperties, lines);
         System.out.println("toggle ConfigProperties.java success");
+
         File appConfig = new File("E:\\idea-workspace\\robot\\src\\main\\java\\com\\spider\\config\\AppConfig.java");
         String lines1 = FileUtils.readFileToString(appConfig);
         if (lines1.contains("//@PropertySource(\"file:/opt/spider/config.properties\")")) {
@@ -47,6 +48,20 @@ public class ToggleConfig {
         }
         FileUtils.writeStringToFile(appConfig, lines1);
         System.out.println("toggle AppConfig.java success");
+
+        File config = new File("E:\\idea-workspace\\robot\\src\\main\\resources\\config.properties");
+        String lines2 = FileUtils.readFileToString(config);
+        if (lines2.contains("500.html.file.path=e:/500") && !lines2.contains("#500.html.file.path=e:/500")) {
+            lines2 = lines2.replace("500.html.file.path=e:/500"
+                    , "#500.html.file.path=e:/500");
+            System.out.println("local to opt");
+        } else {
+            lines2 = lines2.replace("#500.html.file.path=e:/500"
+                    , "500.html.file.path=e:/500");
+            System.out.println("opt to local");
+        }
+        FileUtils.writeStringToFile(config, lines2);
+        System.out.println("toggle config.properties success");
 
     }
 }
