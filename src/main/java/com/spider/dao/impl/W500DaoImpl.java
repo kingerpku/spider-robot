@@ -5,7 +5,6 @@ import com.spider.entity.W500Entity;
 import com.spider.entity.W500HistoryEntity;
 import com.spider.repository.W500HistoryRepository;
 import com.spider.repository.W500Repository;
-import com.spider.sbc.SbcUpdateManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,13 +25,10 @@ public class W500DaoImpl implements W500Dao {
     @Autowired
     private W500HistoryRepository w500HistoryRepository;
 
-    @Autowired
-    private SbcUpdateManager sbcUpdateManager;
-
     @Override
     public boolean saveOrUpdate(W500Entity w500Entity) {
 
-        W500Entity query = w500Repository.findByMatchCode(w500Entity.getMatchCode());
+        W500Entity query = w500Repository.findByUniqueId(w500Entity.getUniqueId());
         if (!w500Entity.equals(query)) {
             W500Entity tmp = null;
             if (query != null) {

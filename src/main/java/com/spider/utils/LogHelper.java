@@ -30,7 +30,7 @@ public class LogHelper {
         logger.info(PERSIST + message);
     }
 
-    public static void error(Logger logger, String message, Exception e) {
+    public static void error(Logger logger, String message, Throwable e) {
 
         logger.info(ERROR + message, e);
     }

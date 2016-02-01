@@ -41,7 +41,7 @@ public class HttpConfig {
 
     private Map<String, String> cookies;
 
-    private Map<String, String> params = new HashMap<String, String>();
+    private Map<String, String> params = new HashMap<>();
 
     private int timeOut;
 

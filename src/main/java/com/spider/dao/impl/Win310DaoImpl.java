@@ -1,6 +1,5 @@
 package com.spider.dao.impl;
 
-import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import com.spider.entity.*;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spider.dao.Win310Dao;
-import com.spider.utils.Calendars;
 import com.spider.utils.LogHelper;
 
 @Service
@@ -34,7 +32,7 @@ public class Win310DaoImpl implements Win310Dao {
 
         boolean result = false;
         try {
-            TCrawlerWin310 queried = win310Repository.findByCompetitionNum(win310.getCompetitionNum());
+            TCrawlerWin310 queried = win310Repository.findByUniqueId(win310.getUniqueId());
 
             if (queried != null) {
                 result = isUpdate(win310, result, queried);

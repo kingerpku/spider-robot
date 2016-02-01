@@ -5,10 +5,11 @@ import com.spider.entity.PinnacleEntity;
 import com.spider.entity.PinnacleHistoryEntity;
 import com.spider.repository.PinnacleHistoryRepository;
 import com.spider.repository.PinnacleRepository;
+import com.spider.utils.LogHelper;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.logging.Logger;
 
 /**
  * Created by wsy on 2015/12/21.
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
 @Repository
 public class PinnaclesDaoImpl implements PinnaclesDao {
 
-    private Logger logger = Logger.getLogger("info_logger");
+    private Logger logger = Logger.getLogger("pinnacle_logger");
 
     @Autowired
     private PinnacleRepository pinnacleRepository;
@@ -30,17 +31,18 @@ public class PinnaclesDaoImpl implements PinnaclesDao {
         PinnacleEntity query = pinnacleRepository.findByEventId(pinnacleEntity.getEventId());
         if (query != null) {
             if (pinnacleEntity.equals(query)) {
+                LogHelper.persist(logger, "same as database");
                 return;
             } else {
                 PinnacleHistoryEntity entity = new PinnacleHistoryEntity(pinnacleEntity);
                 pinnacleHistoryRepository.save(entity);
-                logger.info("save pinnacle history " + entity);
+                LogHelper.persist(logger, "save pinnacle history " + entity);
                 pinnacleRepository.save(pinnacleEntity);
-                logger.info("save pinnacle " + pinnacleEntity);
+                LogHelper.persist(logger, "save pinnacle " + pinnacleEntity);
             }
         } else {
             pinnacleRepository.save(pinnacleEntity);
-            logger.info("save pinnacle " + pinnacleEntity);
+            LogHelper.persist(logger, "save pinnacle " + pinnacleEntity);
         }
     }
 }

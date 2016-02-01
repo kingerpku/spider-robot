@@ -32,9 +32,7 @@ public class StatisticRobot implements Runnable {
 
     public static final int AWAY_TEAM_TYPE = 2;
 
-    public static final String ERROR = "[ERROR]-";
-
-    private Logger logger = Logger.getLogger("info_logger");
+    private Logger logger = Logger.getLogger("statistic_logger");
 
     @Autowired
     TCrawlerWin310Repository tCrawlerWin310Repository;
@@ -75,6 +73,7 @@ public class StatisticRobot implements Runnable {
         List<NowgoalKeyEvent> nowgoalKeyEvents = getKeyEventList(europeId, htmlPage);
         for (NowgoalKeyEvent nke : nowgoalKeyEvents) {
             nowgoalKeyEventRepository.save(nke);
+            LogHelper.persist(logger, "save " + nke);
         }
     }
 
@@ -86,9 +85,6 @@ public class StatisticRobot implements Runnable {
             return nowgoalKeyEvents;
         }
         DomNodeList<HtmlElement> trs = keyEventsTable.getElementsByTagName("tr");
-        HtmlElement scoreTr = trs.get(1);//比分在第二行
-        String homeScore = scoreTr.getByXPath("td[1]/span/text()").get(0).toString();
-        String awayScore = scoreTr.getByXPath("td[3]/span/text()").get(0).toString();
         for (int i = 2; i < trs.getLength(); i++) {
             HtmlElement tr = trs.get(i);
             NowgoalKeyEvent nowgoalKeyEvent = new NowgoalKeyEvent();
@@ -314,12 +310,12 @@ public class StatisticRobot implements Runnable {
         NowgoalMatchEntity matchEntity = new NowgoalMatchEntity();
         String home = ((DomText) htmlPage.getByXPath("//div[@id='home']/a/span/text()").get(0)).getWholeText();
         String away = ((DomText) htmlPage.getByXPath("//div[@id='guest']/a/span/text()").get(0)).getWholeText();
-        String matchTime = ((DomText) htmlPage.getByXPath(
-                "//div[@id='matchItems']/div[@class='item'][2]/span/text()[2]").get(0)).getWholeText();
-        matchEntity.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+//        String matchTime = ((DomText) htmlPage.getByXPath(
+//                "//div[@id='matchItems']/div[@class='item'][2]/span/text()").get(0)).getWholeText().replaceAll("Match Time : ", "");
+//        matchEntity.setUpdateTime(new Timestamp(System.currentTimeMillis()));
         matchEntity.setHomeTeam(home);
         matchEntity.setAwayTeam(away);
-        matchEntity.setMatchTime(matchTime);
+//        matchEntity.setMatchTime(matchTime);
         matchEntity.setEuropeId(europeId);
 
         return matchEntity;
@@ -329,40 +325,45 @@ public class StatisticRobot implements Runnable {
     @Override
     public void run() {
 
-        List<TCrawlerWin310> win310s = tCrawlerWin310Repository.findAll();
-        for (TCrawlerWin310 win310 : win310s) {
-            int europeId = Integer.parseInt(win310.getWin310EuropeId());
-            //各个方法相关性不大，一个抛异常不应该影响另一个，而且暂时没有必要拆成多线程，so，每个方法一个try catch
-            HtmlPage htmlPage;
-            String url = "http://www.nowgoal.com/detail/" + europeId + ".html";
-            try {
-                htmlPage = webClient.getPage(url);
-            } catch (IOException e) {
-                LogHelper.error(logger, "get " + url, e);
-                return;
-            } finally {
-                webClientJs.closeAllWindows();
+        try {
+            List<TCrawlerWin310> win310s = tCrawlerWin310Repository.findAll();
+            for (TCrawlerWin310 win310 : win310s) {
+                int europeId = Integer.parseInt(win310.getWin310EuropeId());
+                //各个方法相关性不大，一个抛异常不应该影响另一个，而且暂时没有必要拆成多线程，so，每个方法一个try catch
+                HtmlPage htmlPage;
+                String url = "http://www.nowgoal.com/detail/" + europeId + ".html";
+                try {
+                    htmlPage = webClient.getPage(url);
+                    LogHelper.info(logger, "start parse [" + url + "]");
+                } catch (IOException e) {
+                    LogHelper.error(logger, "get " + url, e);
+                    return;
+                } finally {
+                    webClientJs.closeAllWindows();
+                }
+                try {
+                    goKeyEvent(europeId, htmlPage);
+                } catch (Exception e) {
+                    LogHelper.error(logger, "key events error [" + url + "]", e);
+                }
+                try {
+                    goMatchStatistics(europeId, htmlPage);
+                } catch (Exception e) {
+                    LogHelper.error(logger, "match statistics error [" + url + "]", e);
+                }
+                try {
+                    goPlayersInfo(europeId, htmlPage);
+                } catch (Exception e) {
+                    LogHelper.error(logger, "players info error [" + url + "]", e);
+                }
+                try {
+                    goMatchInfo(europeId, htmlPage);
+                } catch (Exception e) {
+                    LogHelper.error(logger, "match info error [" + url + "]", e);
+                }
             }
-            try {
-                goKeyEvent(europeId, htmlPage);
-            } catch (Exception e) {
-                logger.info(ERROR + "key events error, url " + url, e);
-            }
-            try {
-                goMatchStatistics(europeId, htmlPage);
-            } catch (Exception e) {
-                logger.info(ERROR + "match statistics error, url " + url, e);
-            }
-            try {
-                goPlayersInfo(europeId, htmlPage);
-            } catch (Exception e) {
-                logger.info(ERROR + "players info error, url " + url, e);
-            }
-            try {
-                goMatchInfo(europeId, htmlPage);
-            } catch (Exception e) {
-                logger.info(ERROR + "match info error, url " + url, e);
-            }
+        } catch (Throwable e) {
+            LogHelper.error(logger, "run statistic robot error", e);
         }
     }
 }

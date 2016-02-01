@@ -11,7 +11,8 @@ import java.sql.Timestamp;
 @Table(name = "pinnacle_history", schema = "", catalog = "crawler")
 public class PinnacleHistoryEntity {
 
-    private  long id;
+    private long id;
+
     private long eventId;
 
     private Integer leagueId;
@@ -36,6 +37,34 @@ public class PinnacleHistoryEntity {
 
     private String awayTeam;
 
+    private Integer state;
+
+    private Integer elapsed;
+
+    @Basic
+    @Column(name = "state")
+    public Integer getState() {
+
+        return state;
+    }
+
+    public void setState(Integer state) {
+
+        this.state = state;
+    }
+
+    @Basic
+    @Column(name = "elapsed")
+    public Integer getElapsed() {
+
+        return elapsed;
+    }
+
+    public void setElapsed(Integer elapsed) {
+
+        this.elapsed = elapsed;
+    }
+
     public PinnacleHistoryEntity(PinnacleEntity pinnacleEntity) {
 
         this.eventId = pinnacleEntity.getEventId();
@@ -50,11 +79,14 @@ public class PinnacleHistoryEntity {
         this.updateTime = pinnacleEntity.getUpdateTime();
         this.homeTeam = pinnacleEntity.getHomeTeam();
         this.awayTeam = pinnacleEntity.getAwayTeam();
+        this.state = pinnacleEntity.getState();
+        this.elapsed = pinnacleEntity.getElapsed();
     }
 
     public PinnacleHistoryEntity() {
 
     }
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -234,6 +266,8 @@ public class PinnacleHistoryEntity {
         if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
         if (homeTeam != null ? !homeTeam.equals(that.homeTeam) : that.homeTeam != null) return false;
         if (awayTeam != null ? !awayTeam.equals(that.awayTeam) : that.awayTeam != null) return false;
+        if (state != null ? !state.equals(that.state) : that.state != null) return false;
+        if (elapsed != null ? !elapsed.equals(that.elapsed) : that.elapsed != null) return false;
 
         return true;
     }
@@ -273,6 +307,8 @@ public class PinnacleHistoryEntity {
                 ", updateTime=" + updateTime +
                 ", homeTeam='" + homeTeam + '\'' +
                 ", awayTeam='" + awayTeam + '\'' +
+                ", state=" + state +
+                ", elapsed=" + elapsed +
                 '}';
     }
 }
