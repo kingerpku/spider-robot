@@ -54,10 +54,14 @@ public class ToggleConfig {
         if (lines2.contains("500.html.file.path=e:/500") && !lines2.contains("#500.html.file.path=e:/500")) {
             lines2 = lines2.replace("500.html.file.path=e:/500"
                     , "#500.html.file.path=e:/500");
+            lines2 = lines2.replace("500.html.file.encoding=gbk"
+                    , "500.html.file.encoding=utf8");
             System.out.println("local to opt");
         } else {
             lines2 = lines2.replace("#500.html.file.path=e:/500"
                     , "500.html.file.path=e:/500");
+            lines2 = lines2.replace("500.html.file.encoding=utf8"
+                    , "500.html.file.encoding=gbk");
             System.out.println("opt to local");
         }
         FileUtils.writeStringToFile(config, lines2);

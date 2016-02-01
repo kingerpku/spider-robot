@@ -156,4 +156,19 @@ public class NowgoalKeyEvent {
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+
+        return "NowgoalKeyEvent{" +
+                "id=" + id +
+                ", matchId=" + matchId +
+                ", timeMinute=" + timeMinute +
+                ", eventType=" + eventType +
+                ", relativePlayer='" + relativePlayer + '\'' +
+                ", eventDesc='" + eventDesc + '\'' +
+                ", teamType=" + teamType +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }
