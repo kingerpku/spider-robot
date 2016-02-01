@@ -3,7 +3,6 @@ package com.spider.config;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.spider.global.Constants;
 import com.spider.robot.CompanyOddsRobot;
-import com.spider.robot.ThreeInOneParser;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
@@ -33,24 +32,6 @@ public class AppConfig {
         PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
         propertySourcesPlaceholderConfigurer.setLocation(new ClassPathResource("config.properties"));
         return propertySourcesPlaceholderConfigurer;
-    }
-
-    /**
-     * @return 返回利记的解析器
-     */
-    @Bean
-    public ThreeInOneParser ljParser() {
-
-        return new ThreeInOneParser(Constants.LIJI_NAME);
-    }
-
-    /**
-     * @return 返回金宝博的解析
-     */
-    @Bean
-    public ThreeInOneParser jbbParser() {
-
-        return new ThreeInOneParser(Constants.JINBAOBO_NAME);
     }
 
     /**
