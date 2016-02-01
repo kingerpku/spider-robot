@@ -14,9 +14,14 @@ public class CopyJar {
 
     public static void main(String[] args) throws IOException {
 
-        FileUtils.copyFile(new File("E:\\idea-workspace\\robot\\target\\spider-robot.jar"), new File("k:\\tmp\\spider-robot.jar"));
+        String source1 = "E:\\idea-workspace\\robot\\target\\spider-robot.jar";
+        String dest1 = "k:\\tmp\\spider-robot.jar";
+        FileUtils.copyFile(new File(source1), new File(dest1));
         System.out.println("copy spider-robot.jar success");
-        FileUtils.copyFile(new File("E:\\idea-workspace\\matlab-service\\target\\matlab-service.jar"), new File("k:\\tmp\\matlab-service.jar"));
+
+        String source2 = "E:\\idea-workspace\\matlab-service\\target\\matlab-service.jar";
+        String dest2 = "k:\\tmp\\matlab-service.jar";
+        FileUtils.copyFile(new File(source2), new File(dest2));
         System.out.println("copy matlab-service.jar success");
     }
 }

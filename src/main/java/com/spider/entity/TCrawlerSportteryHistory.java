@@ -308,7 +308,7 @@ public class TCrawlerSportteryHistory implements java.io.Serializable {
         if ("".equals(competitionNum)) {
             result = false;
         }
-        if ("".equals(startDate)) {
+        if (startDate == null) {
             result = false;
         }
         if ("".equals(BDate)) {

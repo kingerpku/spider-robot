@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * Created by wsy on 2016/1/7.
@@ -236,6 +236,12 @@ public class W500Robot implements Runnable {
             homeRedCard = Integer.valueOf(cardList.get(0).getWholeText());
         }
         return homeRedCard;
+    }
+
+    public static void main(String[] args) throws ParseException {
+
+        long mills = DateUtils.diffAbsMills(new Date(), org.apache.commons.lang3.time.DateUtils.parseDate("20530301", "yyyyMMdd"));
+        System.out.println(mills / 60 / 60 / 1000 / 24);
     }
 
 }

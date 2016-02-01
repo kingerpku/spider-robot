@@ -311,7 +311,7 @@ public class TCrawlerSporttery implements java.io.Serializable {
         if ("".equals(competitionNum)) {
             result = false;
         }
-        if ("".equals(startDateTime)) {
+        if (startDateTime == null) {
             result = false;
         }
         if ("".equals(bDate)) {
