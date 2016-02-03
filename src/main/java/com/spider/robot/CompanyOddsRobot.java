@@ -1,12 +1,16 @@
 package com.spider.robot;
 
-import com.gargoylesoftware.htmlunit.html.*;
+import com.gargoylesoftware.htmlunit.html.DomText;
+import com.gargoylesoftware.htmlunit.html.HtmlFont;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlScript;
+import com.gargoylesoftware.htmlunit.html.HtmlTable;
+import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 import com.spider.dao.CompanyOddsDao;
 import com.spider.domain.CompanyOddsParam;
 import com.spider.domain.GamingCompany;
 import com.spider.entity.CompanyOddsEntity;
 import com.spider.entity.TCrawlerWin310;
-import com.spider.fetcher.Fetcher;
 import com.spider.fetcher.HttpConfig;
 import com.spider.fetcher.impl.HttpClientFetcherImpl;
 import com.spider.global.Constants;
@@ -23,8 +27,16 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.spider.global.Constants.JINBAOBO_NAME;
 import static com.spider.global.Constants.LIJI_NAME;
@@ -44,8 +56,6 @@ public class CompanyOddsRobot implements Runnable {
     private static final String lijiPageUrlTemplate = "http://data.nowgoal.com/3in1odds/" + GamingCompany.LiJi.getId() + "_{0}.html";
 
     private String companyName;
-
-    private Fetcher fetcher = new HttpClientFetcherImpl();
 
     private HttpConfig httpConfig = new HttpConfig();
 
@@ -87,7 +97,6 @@ public class CompanyOddsRobot implements Runnable {
 
         Date start = new Date();
         List<TCrawlerWin310> onSaleMatches = win310Repository.findOnSaleMatches();
-//        List<TCrawlerWin310> onSaleMatches = win310Repository.findAll();
         String serviceName = null;
         if (JINBAOBO_NAME.equals(companyName)) {
             serviceName = ServiceName.JinBaoBoRobot.getName();
